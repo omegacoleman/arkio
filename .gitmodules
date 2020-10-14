@@ -1,0 +1,9 @@
+[submodule "vendor/googletest"]
+	path = vendor/googletest
+	url = git@github.com:google/googletest.git
+[submodule "vendor/GSL"]
+	path = vendor/GSL
+	url = git@github.com:microsoft/GSL
+[submodule "vendor/function2"]
+	path = vendor/function2
+	url = https://github.com/Naios/function2.git
