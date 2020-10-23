@@ -1,6 +1,7 @@
-
 - [x] remove kernel version barriers
+- [ ] split seekable and unseekable fd
+- [ ] bind fd to async contexts
 - [ ] streambuf migration
-- [ ] more tests
+- [ ] more and better tests
 - [ ] multithreading
 
