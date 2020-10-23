@@ -14,19 +14,17 @@ namespace net {
 namespace tcp {
 namespace async {
 
-template <clinux::version_t KernVer = clinux::version_code>
 inline void connect(async_context &ctx, socket &f, const address &endpoint,
-                    callback<void> &&cb) noexcept {
-  async_syscall::connect<async_context, KernVer>(
+                    callback<error_code> &&cb) noexcept {
+  async_syscall::connect(
       ctx, f.get(), endpoint.sa_ptr(), endpoint.sa_len(),
-      [cb(forward<callback<void>>(cb))](ec_or<long> ret) mutable {
+      [cb(forward<callback<error_code>>(cb))](ec_or<long> ret) mutable {
         if (!ret)
           cb(ret.ec());
         cb({});
       });
 }
 
-template <clinux::version_t KernVer = clinux::version_code>
 struct accept_with_address_impl {
   struct locals_t {
     acceptor &f_;
@@ -37,11 +35,11 @@ struct accept_with_address_impl {
 
     locals_t(acceptor &f, address &endpoint) : f_(f), endpoint_(endpoint) {}
   };
-  using ret_t = socket;
+  using ret_t = ec_or<socket>;
   using op_t = async_op<accept_with_address_impl>;
 
   static void run(op_t &op) noexcept {
-    async_syscall::accept<async_context, KernVer>(
+    async_syscall::accept(
         op.ctx_, op.locals_->f_.get(),
         reinterpret_cast<clinux::sockaddr *>(op.locals_->addr_buf.data()),
         addressof(op.locals_->addrlen_buf), 0,
@@ -59,21 +57,19 @@ struct accept_with_address_impl {
   }
 };
 
-template <clinux::version_t KernVer = clinux::version_code>
 inline void accept(async_context &ctx, acceptor &srv, address &endpoint,
-                   callback<socket> &&cb) noexcept {
-  using impl_t = accept_with_address_impl<KernVer>;
-  async_op<impl_t>(ctx, forward<callback<socket>>(cb),
+                   callback<ec_or<socket>> &&cb) noexcept {
+  using impl_t = accept_with_address_impl;
+  async_op<impl_t>(ctx, forward<callback<ec_or<socket>>>(cb),
                    make_unique<typename impl_t::locals_t>(srv, endpoint))
       .run();
 }
 
-template <clinux::version_t KernVer = clinux::version_code>
 inline void accept(async_context &ctx, acceptor &srv,
-                   callback<socket> &&cb) noexcept {
-  async_syscall::accept<async_context, KernVer>(
+                   callback<ec_or<socket>> &&cb) noexcept {
+  async_syscall::accept(
       ctx, srv.get(), NULL, NULL, 0,
-      [cb(forward<callback<socket>>(cb))](ec_or<long> ret) mutable {
+      [cb(forward<callback<ec_or<socket>>>(cb))](ec_or<long> ret) mutable {
         if (!ret)
           cb(ret.ec());
         cb(wrap_accepted_socket(static_cast<int>(ret.get())));

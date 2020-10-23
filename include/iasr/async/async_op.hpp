@@ -26,26 +26,28 @@ public:
 
   template <typename CallRet>
   callback<CallRet>
-  yield(unique_function<void(async_op &op, ec_or<CallRet> ret)> next) noexcept {
-    return [moved_this(move(*this)), next(move(next))](
-               ec_or<CallRet> ret) mutable { next(moved_this, ret); };
+  yield(unique_function<void(async_op &op, CallRet ret)> next) noexcept {
+    return [moved_this(move(*this)), next(move(next))](CallRet ret) mutable {
+      next(moved_this, ret);
+    };
   }
 
   syscall_callback_t yield_syscall(
-      unique_function<void(async_op &op, ec_or<long> ret)> next) noexcept {
-    return yield<long>(move(next));
+      unique_function<void(async_op &op, syscall_callback_t::result_type ret)>
+          next) noexcept {
+    return yield<syscall_callback_t::result_type>(move(next));
   }
 
   void run() noexcept { Impl::run(*this); }
 
   template <typename Ret = ret_t, typename T = enable_if_t<!is_void_v<Ret>>>
-  void complete(ec_or<ret_t> ret) noexcept {
+  void complete(Ret ret) noexcept {
     cb_(move(ret));
   }
 
   template <typename Ret = ret_t, typename T = enable_if_t<is_void_v<Ret>>>
-  void complete(error_code ec) noexcept {
-    cb_(ec);
+  void complete() noexcept {
+    cb_();
   }
 };
 

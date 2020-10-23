@@ -1,5 +1,5 @@
 
-- [ ] remove kernel version barriers
+- [x] remove kernel version barriers
 - [ ] streambuf migration
 - [ ] more tests
 - [ ] multithreading

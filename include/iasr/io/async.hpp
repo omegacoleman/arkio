@@ -23,7 +23,7 @@ struct read_some_bseq_impl {
     locals_t(fd &f, BufferSeq &b) noexcept
         : f_(f), iovecs_(to_iovec_array_ptr(b)) {}
   };
-  using ret_t = size_t;
+  using ret_t = ec_or<size_t>;
   using op_t = async_op<read_some_bseq_impl>;
 
   static void run(op_t &op) noexcept {
@@ -56,7 +56,7 @@ struct write_some_bseq_impl {
     locals_t(fd &f, ConstBufferSeq &b) noexcept
         : f_(f), iovecs_(to_iovec_array_ptr(b)) {}
   };
-  using ret_t = size_t;
+  using ret_t = ec_or<size_t>;
   using op_t = async_op<write_some_bseq_impl>;
 
   static void run(op_t &op) noexcept {
@@ -82,9 +82,9 @@ struct write_some_bseq_impl {
 
 template <class BufferSeq, enable_if_t<is_buffer_seq_v<BufferSeq>, int> = 0>
 inline void read_some(async_context &ctx, fd &f, BufferSeq &b,
-                      callback<size_t> &&cb) noexcept {
+                      callback<ec_or<size_t>> &&cb) noexcept {
   using impl_t = read_some_bseq_impl;
-  async_op<impl_t>(ctx, forward<callback<size_t>>(cb),
+  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
                    make_unique<impl_t::locals_t>(f, b))
       .run();
 }
@@ -92,23 +92,23 @@ inline void read_some(async_context &ctx, fd &f, BufferSeq &b,
 template <class ConstBufferSeq,
           enable_if_t<is_buffer_seq_v<ConstBufferSeq>, int> = 0>
 inline void write_some(async_context &ctx, fd &f, ConstBufferSeq &b,
-                       callback<size_t> &&cb) noexcept {
+                       callback<ec_or<size_t>> &&cb) noexcept {
   using impl_t = write_some_bseq_impl;
-  async_op<impl_t>(ctx, forward<callback<size_t>>(cb),
+  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
                    make_unique<impl_t::locals_t>(f, b))
       .run();
 }
 
 inline void read_some(async_context &ctx, fd &f, const buffer_view b,
-                      callback<size_t> &&cb) noexcept {
+                      callback<ec_or<size_t>> &&cb) noexcept {
   array<buffer_view, 1> b_wrap{b};
-  read_some(ctx, f, b_wrap, forward<callback<size_t>>(cb));
+  read_some(ctx, f, b_wrap, forward<callback<ec_or<size_t>>>(cb));
 }
 
 inline void write_some(async_context &ctx, fd &f, const const_buffer_view b,
-                       callback<size_t> &&cb) noexcept {
+                       callback<ec_or<size_t>> &&cb) noexcept {
   array<const_buffer_view, 1> b_wrap{b};
-  write_some(ctx, f, b_wrap, forward<callback<size_t>>(cb));
+  write_some(ctx, f, b_wrap, forward<callback<ec_or<size_t>>>(cb));
 }
 
 struct read_buffer_impl {
@@ -120,14 +120,14 @@ struct read_buffer_impl {
     locals_t(fd &f, const buffer_view b) noexcept
         : f_(f), remain_(b), done_(0) {}
   };
-  using ret_t = size_t;
+  using ret_t = ec_or<size_t>;
   using op_t = async_op<read_buffer_impl>;
 
   static void run(op_t &op) noexcept { do_read(op); }
 
   static void do_read(op_t &op) noexcept {
     read_some(op.ctx_, op.locals_->f_, op.locals_->remain_,
-              op.yield<size_t>(continue_read));
+              op.yield<ec_or<size_t>>(continue_read));
   }
 
   static void continue_read(op_t &op, ec_or<size_t> ret) noexcept {
@@ -159,14 +159,14 @@ struct write_buffer_impl {
     locals_t(fd &f, const const_buffer_view b) noexcept
         : f_(f), remain_(b), done_(0) {}
   };
-  using ret_t = size_t;
+  using ret_t = ec_or<size_t>;
   using op_t = async_op<write_buffer_impl>;
 
   static void run(op_t &op) noexcept { do_write(op); }
 
   static void do_write(op_t &op) noexcept {
     write_some(op.ctx_, op.locals_->f_, op.locals_->remain_,
-               op.yield<size_t>(continue_write));
+               op.yield<ec_or<size_t>>(continue_write));
   }
 
   static void continue_write(op_t &op, ec_or<size_t> ret) noexcept {
@@ -186,17 +186,17 @@ struct write_buffer_impl {
 };
 
 inline void read(async_context &ctx, fd &f, const buffer_view b,
-                 callback<size_t> &&cb) noexcept {
+                 callback<ec_or<size_t>> &&cb) noexcept {
   using impl_t = read_buffer_impl;
-  async_op<impl_t>(ctx, forward<callback<size_t>>(cb),
+  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
                    make_unique<impl_t::locals_t>(f, b))
       .run();
 }
 
 inline void write(async_context &ctx, fd &f, const const_buffer_view b,
-                  callback<size_t> &&cb) noexcept {
+                  callback<ec_or<size_t>> &&cb) noexcept {
   using impl_t = write_buffer_impl;
-  async_op<impl_t>(ctx, forward<callback<size_t>>(cb),
+  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
                    make_unique<impl_t::locals_t>(f, b))
       .run();
 }
@@ -213,7 +213,7 @@ template <class BufferSeq> struct read_bseq_impl {
     locals_t(fd &f, BufferSeq &bseq) noexcept
         : f_(f), bseq_(bseq), done_(0), it_(begin(bseq_)) {}
   };
-  using ret_t = size_t;
+  using ret_t = ec_or<size_t>;
   using op_t = async_op<read_bseq_impl<BufferSeq>>;
 
   static void run(op_t &op) noexcept { do_read(op); }
@@ -224,7 +224,7 @@ template <class BufferSeq> struct read_bseq_impl {
       return;
     }
     read(op.ctx_, op.locals_->f_, *op.locals_->it_,
-         op.template yield<size_t>(continue_read));
+         op.template yield<ec_or<size_t>>(continue_read));
   }
 
   static void continue_read(op_t &op, ec_or<size_t> ret) noexcept {
@@ -255,7 +255,7 @@ template <class ConstBufferSeq> struct write_bseq_impl {
     locals_t(fd &f, ConstBufferSeq &bseq) noexcept
         : f_(f), bseq_(bseq), done_(0), it_(begin(bseq_)) {}
   };
-  using ret_t = size_t;
+  using ret_t = ec_or<size_t>;
   using op_t = async_op<write_bseq_impl<ConstBufferSeq>>;
 
   static void run(op_t &op) noexcept { do_write(op); }
@@ -266,7 +266,7 @@ template <class ConstBufferSeq> struct write_bseq_impl {
       return;
     }
     write(op.ctx_, op.locals_->f_, *op.locals_->it_,
-          op.template yield<size_t>(continue_write));
+          op.template yield<ec_or<size_t>>(continue_write));
   }
 
   static void continue_write(op_t &op, ec_or<size_t> ret) noexcept {
@@ -283,9 +283,9 @@ template <class ConstBufferSeq> struct write_bseq_impl {
 
 template <class BufferSeq, enable_if_t<is_buffer_seq_v<BufferSeq>, int> = 0>
 inline void read(async_context &ctx, fd &f, BufferSeq &b,
-                 callback<size_t> &&cb) noexcept {
+                 callback<ec_or<size_t>> &&cb) noexcept {
   using impl_t = read_bseq_impl<BufferSeq>;
-  async_op<impl_t>(ctx, forward<callback<size_t>>(cb),
+  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
                    make_unique<typename impl_t::locals_t>(f, b))
       .run();
 }
@@ -293,9 +293,9 @@ inline void read(async_context &ctx, fd &f, BufferSeq &b,
 template <class ConstBufferSeq,
           enable_if_t<is_buffer_seq_v<ConstBufferSeq>, int> = 0>
 inline void write(async_context &ctx, fd &f, ConstBufferSeq &b,
-                  callback<size_t> &&cb) noexcept {
+                  callback<ec_or<size_t>> &&cb) noexcept {
   using impl_t = write_bseq_impl<ConstBufferSeq>;
-  async_op<impl_t>(ctx, forward<callback<size_t>>(cb),
+  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
                    make_unique<typename impl_t::locals_t>(f, b))
       .run();
 }

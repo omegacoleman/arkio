@@ -7,15 +7,16 @@
 namespace iasr {
 
 template <typename RetType>
-struct callback : public unique_function<void(ec_or<RetType> result)> {
-  using unique_function<void(ec_or<RetType> result)>::unique_function;
+struct callback : public unique_function<void(RetType result)> {
+  using unique_function<void(RetType result)>::unique_function;
+  using result_type = RetType;
 };
 
-template <>
-struct callback<void> : public unique_function<void(error_code result)> {
-  using unique_function<void(error_code result)>::unique_function;
+template <> struct callback<void> : public unique_function<void()> {
+  using unique_function<void()>::unique_function;
+  using result_type = void;
 };
 
-using syscall_callback_t = callback<long>;
+using syscall_callback_t = callback<ec_or<long>>;
 
 } // namespace iasr

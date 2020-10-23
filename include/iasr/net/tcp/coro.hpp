@@ -16,8 +16,7 @@ namespace net {
 namespace tcp {
 namespace coro {
 
-template <clinux::version_t KernVer = clinux::version_code>
-struct connect_awaitable : public awaitable_op<void> {
+struct connect_awaitable : public awaitable_op<error_code> {
   async_context &ctx_;
   socket &f_;
   const address &endpoint_;
@@ -26,8 +25,8 @@ struct connect_awaitable : public awaitable_op<void> {
                     const address &endpoint) noexcept
       : ctx_(ctx), f_(f), endpoint_(endpoint) {}
 
-  void invoke(callback<void> &&cb) noexcept override {
-    async::connect<KernVer>(ctx_, f_, endpoint_, forward<callback<void>>(cb));
+  void invoke(callback<error_code> &&cb) noexcept override {
+    async::connect(ctx_, f_, endpoint_, forward<callback<error_code>>(cb));
   }
 };
 
@@ -36,8 +35,7 @@ inline auto connect(async_context &ctx, socket &f,
   return connect_awaitable(ctx, f, endpoint);
 }
 
-template <clinux::version_t KernVer = clinux::version_code>
-struct accept_with_ep_awaitable : public awaitable_op<socket> {
+struct accept_with_ep_awaitable : public awaitable_op<ec_or<socket>> {
   async_context &ctx_;
   acceptor &srv_;
   address &endpoint_;
@@ -46,34 +44,30 @@ struct accept_with_ep_awaitable : public awaitable_op<socket> {
                            address &endpoint) noexcept
       : ctx_(ctx), srv_(srv), endpoint_(endpoint) {}
 
-  void invoke(callback<socket> &&cb) noexcept override {
-    async::accept<KernVer>(ctx_, srv_, endpoint_,
-                           forward<callback<socket>>(cb));
+  void invoke(callback<ec_or<socket>> &&cb) noexcept override {
+    async::accept(ctx_, srv_, endpoint_, forward<callback<ec_or<socket>>>(cb));
   }
 };
 
-template <clinux::version_t KernVer = clinux::version_code>
-struct accept_awaitable : public awaitable_op<socket> {
+struct accept_awaitable : public awaitable_op<ec_or<socket>> {
   async_context &ctx_;
   acceptor &srv_;
 
   accept_awaitable(async_context &ctx, acceptor &srv) noexcept
       : ctx_(ctx), srv_(srv) {}
 
-  void invoke(callback<socket> &&cb) noexcept override {
-    async::accept<KernVer>(ctx_, srv_, forward<callback<socket>>(cb));
+  void invoke(callback<ec_or<socket>> &&cb) noexcept override {
+    async::accept(ctx_, srv_, forward<callback<ec_or<socket>>>(cb));
   }
 };
 
-template <clinux::version_t KernVer = clinux::version_code>
 inline auto accept(async_context &ctx, acceptor &srv,
                    address &endpoint) noexcept {
-  return accept_with_ep_awaitable<KernVer>(ctx, srv, endpoint);
+  return accept_with_ep_awaitable(ctx, srv, endpoint);
 }
 
-template <clinux::version_t KernVer = clinux::version_code>
 inline auto accept(async_context &ctx, acceptor &srv) noexcept {
-  return accept_awaitable<KernVer>(ctx, srv);
+  return accept_awaitable(ctx, srv);
 }
 
 } // namespace coro
