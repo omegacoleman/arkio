@@ -9,18 +9,30 @@ namespace iasr {
 namespace net {
 namespace tcp {
 
-class acceptor : public fd {
+class acceptor : public nonseekable_fd {
 protected:
-  acceptor(int fd_int)
-      : fd(fd_int, fd_offset::offset_manager{fd_offset::socket}) {}
+  acceptor(int fd_int) : nonseekable_fd(fd_int) {}
 
-public:
-  static ec_or<acceptor> create(bool use_ipv6 = false) noexcept {
+private:
+  static ec_or<acceptor> __create(async_context *ctx,
+                                  bool use_ipv6 = false) noexcept {
     int ret = clinux::socket(use_ipv6 ? AF_INET6 : AF_INET, SOCK_STREAM, 0);
     if (ret == -1) {
       return clinux::errno_ec();
     }
-    return acceptor(ret);
+    acceptor ret_fd(ret);
+    ret_fd.set_async_context(ctx);
+    return move(ret_fd);
+  }
+
+public:
+  static ec_or<acceptor> create(bool use_ipv6 = false) noexcept {
+    return __create(nullptr, use_ipv6);
+  }
+
+  static ec_or<acceptor> create(async_context &ctx,
+                                bool use_ipv6 = false) noexcept {
+    return __create(&ctx, use_ipv6);
   }
 };
 

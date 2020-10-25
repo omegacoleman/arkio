@@ -1,14 +1,12 @@
 #include <iasr/buffer/buffer.hpp>
 #include <iasr/buffer/buffer_view.hpp>
 #include <iasr/error/ec_or.hpp>
-#include <iasr/io/normal_file.hpp>
-#include <iasr/io/stdio.hpp>
+#include <iasr/general/normal_file.hpp>
 #include <iasr/io/sync.hpp>
 
 int main(int argc, char **argv) {
   using iasr::buffer;
   using iasr::buffer_view;
-  using iasr::fd_stdout;
   using iasr::normal_file;
   using iasr::panic_on_ec;
   namespace sync = iasr::sync;
@@ -21,7 +19,7 @@ int main(int argc, char **argv) {
       if (sz == 0) {
         goto next;
       }
-      panic_on_ec(sync::write(fd_stdout, buffer_view(buf.data(), sz)));
+      std::cout.write(buf.data(), sz);
     }
   next:;
   }

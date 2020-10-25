@@ -24,7 +24,7 @@ inline ec_or<socket> accept(acceptor &srv) noexcept {
   if (ret == -1) {
     return clinux::errno_ec();
   }
-  return move(wrap_accepted_socket(ret));
+  return wrap_accepted_socket(nullptr, ret);
 }
 
 inline ec_or<socket> accept(acceptor &srv, address &endpoint) noexcept {
@@ -37,7 +37,7 @@ inline ec_or<socket> accept(acceptor &srv, address &endpoint) noexcept {
     return clinux::errno_ec();
   }
   endpoint = address(buffer(addr_buf.begin(), addr_buf.begin() + addrlen_buf));
-  return move(wrap_accepted_socket(ret));
+  return wrap_accepted_socket(nullptr, ret);
 }
 
 } // namespace sync

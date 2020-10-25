@@ -1,7 +1,6 @@
 #include <iasr/buffer/buffer.hpp>
 #include <iasr/buffer/buffer_view.hpp>
 #include <iasr/error/ec_or.hpp>
-#include <iasr/io/stdio.hpp>
 #include <iasr/io/sync.hpp>
 #include <iasr/net/address.hpp>
 #include <iasr/net/tcp/acceptor.hpp>
@@ -14,7 +13,6 @@
 int main(void) {
   using iasr::buffer;
   using iasr::buffer_view;
-  using iasr::fd_stdout;
   using iasr::panic_on_ec;
   namespace sync = iasr::sync;
   namespace net = iasr::net;

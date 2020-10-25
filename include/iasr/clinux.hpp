@@ -39,6 +39,7 @@ using ::off_t;
 using ::open;
 using ::preadv2;
 using ::pwritev2;
+using ::read;
 using ::sa_family_t;
 using ::signal;
 using ::sockaddr;
@@ -46,6 +47,7 @@ using ::sockaddr_in;
 using ::sockaddr_in6;
 using ::socket;
 using ::socklen_t;
+using ::write;
 
 inline error_code errno_ec() noexcept {
   return error_code(errno, system_category());

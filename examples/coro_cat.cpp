@@ -3,9 +3,8 @@
 #include <iasr/coroutine/co_async.hpp>
 #include <iasr/coroutine/task.hpp>
 #include <iasr/error/ec_or.hpp>
+#include <iasr/general/normal_file.hpp>
 #include <iasr/io/coro.hpp>
-#include <iasr/io/normal_file.hpp>
-#include <iasr/io/stdio.hpp>
 #include <iostream>
 
 using iasr::async_context;
@@ -13,43 +12,31 @@ using iasr::buffer;
 using iasr::buffer_view;
 using iasr::ec_or;
 using iasr::error_code;
-using iasr::fd;
-using iasr::fd_stdin;
-using iasr::fd_stdout;
 using iasr::normal_file;
 using iasr::panic_on_ec;
 using iasr::task;
 namespace coro = iasr::coro;
 
-task<error_code> to_stdout(async_context &ctx, fd &f) {
+task<error_code> to_stdout(normal_file &f) {
   buffer buf{1024};
-  std::cerr << "hey hey" << std::endl;
   for (;;) {
-    auto read_ret = co_await coro::read_some(ctx, f, buf);
-    std::cerr << "hey hey" << std::endl;
+    auto read_ret = co_await coro::read_some(f, buf);
     if (!read_ret)
       co_return read_ret.ec();
     size_t sz = read_ret.get();
     if (sz == 0) {
       co_return error_code{};
     }
-    auto write_ret =
-        co_await coro::write(ctx, fd_stdout, buffer_view{buf.data(), sz});
-    if (!write_ret)
-      co_return write_ret.ec();
-    std::cerr << "hey hey" << std::endl;
+    std::cout << std::string_view{buf.data(), sz};
   }
 }
 
 task<void> coro_cat(async_context &ctx,
                     const std::vector<std::string> &filenames) {
 
-  if (filenames.empty())
-    panic_on_ec(co_await to_stdout(ctx, fd_stdin));
-
   for (auto &filename : filenames) {
-    normal_file f{panic_on_ec(normal_file::open(filename, O_RDONLY))};
-    panic_on_ec(co_await to_stdout(ctx, f));
+    normal_file f{panic_on_ec(normal_file::open(ctx, filename, O_RDONLY))};
+    panic_on_ec(co_await to_stdout(f));
   }
 
   ctx.exit();

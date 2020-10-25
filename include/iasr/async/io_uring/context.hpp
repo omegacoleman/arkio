@@ -5,8 +5,6 @@
 
 #include <iasr/async/io_uring/io_uring.hpp>
 #include <iasr/error/ec_or.hpp>
-#include <iasr/io/event_fd.hpp>
-#include <iasr/io/sync.hpp>
 
 namespace iasr {
 namespace io_uring_async {
@@ -28,7 +26,7 @@ private:
 
   static const constexpr unsigned batch_size = 1024;
 
-  event_fd waker_;
+  int waker_evfd_;
   volatile bool need_wake_;
 
   bool inited_;
@@ -56,23 +54,23 @@ private:
   }
 
   error_code add_waker() noexcept {
-    auto ret = add_sqe(
-        [this](sqe_ref sqe) { sqe.prep_poll_add(waker_.get(), POLLIN); },
-        [this](ec_or<long> ret) {
-          if (!ret) {
-            this->exit_error(ret.ec());
-            return;
-          }
-          buffer b{sizeof(uint64_t)};
-          auto read_ret = sync::read(waker_, b);
-          if (!read_ret) {
-            this->exit_error(read_ret.ec());
-            return;
-          }
-          error_code ec = this->add_waker();
-          if (ec)
-            this->exit_error(ec);
-        });
+    auto ret =
+        add_sqe([this](sqe_ref sqe) { sqe.prep_poll_add(waker_evfd_, POLLIN); },
+                [this](ec_or<long> ret) {
+                  if (!ret) {
+                    this->exit_error(ret.ec());
+                    return;
+                  }
+                  buffer b{sizeof(uint64_t)};
+                  auto read_ret = clinux::read(waker_evfd_, b.data(), b.size());
+                  if (read_ret == -1) {
+                    this->exit_error(clinux::errno_ec());
+                    return;
+                  }
+                  error_code ec = this->add_waker();
+                  if (ec)
+                    this->exit_error(ec);
+                });
     if (!ret)
       return ret.ec();
     return {};
@@ -98,9 +96,10 @@ public:
   error_code init() noexcept {
     Expects(!inited_);
 
-    auto waker_ret = event_fd::create(0, 0);
-    IASR_PASS_EC_ON(waker_ret);
-    waker_ = waker_ret.get();
+    int waker_ret = clinux::eventfd(0, 0);
+    if (waker_ret == -1)
+      return clinux::errno_ec();
+    waker_evfd_ = waker_ret;
 
     error_code ec = r_.queue_init(batch_size, 0);
     if (ec)
@@ -119,8 +118,10 @@ public:
     if (!need_wake_)
       return {};
     static uint64_t d{1};
-    IASR_PASS_EC_ON(sync::write(
-        waker_, buffer_view{reinterpret_cast<byte *>(&d), sizeof(d)}));
+    auto write_ret = clinux::write(waker_evfd_, &d, sizeof(d));
+    if (write_ret == -1) {
+      return clinux::errno_ec();
+    }
     return {};
   }
 
@@ -151,6 +152,16 @@ public:
 
   error_code run() noexcept {
     for (;;) {
+      if (exiting_) {
+        exiting_ = false;
+        if (exiting_error_) {
+          error_code ret = exiting_error_;
+          exiting_error_ = {};
+          return ret;
+        } else {
+          return {};
+        }
+      }
       submit();
       need_wake_ = true;
       error_code ec = r_.wait();
@@ -188,16 +199,6 @@ public:
       }
       for (auto &it : run_callbacks) {
         it.first(it.second);
-      }
-      if (exiting_) {
-        exiting_ = false;
-        if (exiting_error_) {
-          error_code ret = exiting_error_;
-          exiting_error_ = {};
-          return ret;
-        } else {
-          return {};
-        }
       }
     }
   }

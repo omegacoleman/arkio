@@ -14,10 +14,10 @@ namespace net {
 namespace tcp {
 namespace async {
 
-inline void connect(async_context &ctx, socket &f, const address &endpoint,
+inline void connect(socket &f, const address &endpoint,
                     callback<error_code> &&cb) noexcept {
   async_syscall::connect(
-      ctx, f.get(), endpoint.sa_ptr(), endpoint.sa_len(),
+      f.context(), f.get(), endpoint.sa_ptr(), endpoint.sa_len(),
       [cb(forward<callback<error_code>>(cb))](ec_or<long> ret) mutable {
         if (!ret)
           cb(ret.ec());
@@ -53,26 +53,26 @@ struct accept_with_address_impl {
     op.locals_->endpoint_ =
         address(buffer(op.locals_->addr_buf.begin(),
                        op.locals_->addr_buf.begin() + op.locals_->addrlen_buf));
-    op.complete(wrap_accepted_socket(static_cast<int>(ret.get())));
+    op.complete(wrap_accepted_socket(&op.ctx_, static_cast<int>(ret.get())));
   }
 };
 
-inline void accept(async_context &ctx, acceptor &srv, address &endpoint,
+inline void accept(acceptor &srv, address &endpoint,
                    callback<ec_or<socket>> &&cb) noexcept {
   using impl_t = accept_with_address_impl;
-  async_op<impl_t>(ctx, forward<callback<ec_or<socket>>>(cb),
+  async_op<impl_t>(srv.context(), forward<callback<ec_or<socket>>>(cb),
                    make_unique<typename impl_t::locals_t>(srv, endpoint))
       .run();
 }
 
-inline void accept(async_context &ctx, acceptor &srv,
-                   callback<ec_or<socket>> &&cb) noexcept {
+inline void accept(acceptor &srv, callback<ec_or<socket>> &&cb) noexcept {
   async_syscall::accept(
-      ctx, srv.get(), NULL, NULL, 0,
-      [cb(forward<callback<ec_or<socket>>>(cb))](ec_or<long> ret) mutable {
+      srv.context(), srv.get(), NULL, NULL, 0,
+      [&ctx(srv.context()),
+       cb(forward<callback<ec_or<socket>>>(cb))](ec_or<long> ret) mutable {
         if (!ret)
           cb(ret.ec());
-        cb(wrap_accepted_socket(static_cast<int>(ret.get())));
+        cb(wrap_accepted_socket(&ctx, static_cast<int>(ret.get())));
       });
 }
 

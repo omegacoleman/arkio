@@ -5,7 +5,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/googletest googletest)
 include(GoogleTest)
 
 set(TEST_SRCS
-  test_buffer.cpp;test_error.cpp;test_io_uring.cpp;test_async.cpp;test_net_address.cpp)
+  test_buffer.cpp;test_error.cpp;test_net_address.cpp)
 
 foreach(test_src IN ITEMS ${TEST_SRCS})
 	get_filename_component(test_target ${test_src} NAME_WE)

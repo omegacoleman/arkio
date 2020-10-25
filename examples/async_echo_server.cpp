@@ -3,7 +3,6 @@
 #include <iasr/buffer/buffer_view.hpp>
 #include <iasr/error/ec_or.hpp>
 #include <iasr/io/async.hpp>
-#include <iasr/io/stdio.hpp>
 #include <iasr/net/address.hpp>
 #include <iasr/net/tcp/acceptor.hpp>
 #include <iasr/net/tcp/async.hpp>
@@ -16,22 +15,20 @@ using iasr::async_context;
 using iasr::buffer;
 using iasr::buffer_view;
 using iasr::ec_or;
-using iasr::fd_stdout;
 using iasr::panic_on_ec;
 namespace async = iasr::async;
 namespace net = iasr::net;
 namespace tcp = net::tcp;
 
 struct echo_service : public std::enable_shared_from_this<echo_service> {
-  async_context &ctx_;
   tcp::socket s_;
   buffer buf_{1024};
 
 #ifdef PRINT_ACCESS_LOG
   net::address addr_;
 
-  echo_service(async_context &ctx, tcp::socket s, net::address addr)
-      : ctx_(ctx), s_(std::move(s)), addr_(std::move(addr)) {
+  echo_service(tcp::socket s, net::address addr)
+      : s_(std::move(s)), addr_(std::move(addr)) {
     std::cout << "connected with peer " << peer_name() << std::endl;
   }
 
@@ -47,12 +44,11 @@ struct echo_service : public std::enable_shared_from_this<echo_service> {
   }
 
 #else
-  echo_service(async_context &ctx, tcp::socket s)
-      : ctx_(ctx), s_(std::move(s)) {}
+  echo_service(async_context &ctx, tcp::socket s) : s_(std::move(s)) {}
 #endif
 
   void do_echo() {
-    async::read_some(ctx_, s_, buf_,
+    async::read_some(s_, buf_,
                      std::bind(&echo_service::handle_read, shared_from_this(),
                                std::placeholders::_1));
   }
@@ -73,27 +69,25 @@ struct echo_service : public std::enable_shared_from_this<echo_service> {
     size_t sz = ret.get();
     if (sz == 0)
       return;
-    async::write(ctx_, s_, buffer_view{buf_.data(), buf_.data() + sz},
+    async::write(s_, buffer_view{buf_.data(), buf_.data() + sz},
                  std::bind(&echo_service::handle_write, shared_from_this(),
                            std::placeholders::_1));
   }
 };
 
 struct echo_server : public std::enable_shared_from_this<echo_server> {
-  async_context &ctx_;
   tcp::acceptor ac_;
   net::address addr_;
 
-  echo_server(async_context &ctx, tcp::acceptor ac)
-      : ctx_(ctx), ac_(std::move(ac)) {}
+  echo_server(tcp::acceptor ac) : ac_(std::move(ac)) {}
 
   void run() {
 #ifdef PRINT_ACCESS_LOG
-    tcp::async::accept(ctx_, ac_, addr_,
+    tcp::async::accept(ac_, addr_,
                        std::bind(&echo_server::handle_connection,
                                  shared_from_this(), std::placeholders::_1));
 #else
-    tcp::async::accept(ctx_, ac_,
+    tcp::async::accept(ac_,
                        std::bind(&echo_server::handle_connection,
                                  shared_from_this(), std::placeholders::_1));
 #endif
@@ -105,10 +99,9 @@ struct echo_server : public std::enable_shared_from_this<echo_server> {
       return;
     }
 #ifdef PRINT_ACCESS_LOG
-    auto svc =
-        std::make_shared<echo_service>(ctx_, ret.get(), std::move(addr_));
+    auto svc = std::make_shared<echo_service>(ret.get(), std::move(addr_));
 #else
-    auto svc = std::make_shared<echo_service>(ctx_, ret.get());
+    auto svc = std::make_shared<echo_service>(ret.get());
 #endif
     svc->do_echo();
 
@@ -124,11 +117,11 @@ int main(void) {
   ep.host("127.0.0.1");
   ep.port(8080);
 
-  tcp::acceptor ac{panic_on_ec(tcp::acceptor::create())};
+  tcp::acceptor ac{panic_on_ec(tcp::acceptor::create(ctx))};
   panic_on_ec(tcp::bind(ac, ep));
   panic_on_ec(tcp::listen(ac));
 
-  auto srv = std::make_shared<echo_server>(ctx, std::move(ac));
+  auto srv = std::make_shared<echo_server>(std::move(ac));
   srv->run();
 
   ctx.run();

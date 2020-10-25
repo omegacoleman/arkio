@@ -10,114 +10,47 @@
 #include <iasr/buffer/traits.hpp>
 #include <iasr/error/ec_or.hpp>
 #include <iasr/io/iovecs.hpp>
+#include <iasr/io/nonseekable/async.hpp>
+#include <iasr/io/seekable/async.hpp>
 
 namespace iasr {
 namespace async {
 
-struct read_some_bseq_impl {
-  struct locals_t {
-    fd &f_;
-    vector<clinux::iovec> iovecs_;
-
-    template <class BufferSeq>
-    locals_t(fd &f, BufferSeq &b) noexcept
-        : f_(f), iovecs_(to_iovec_array_ptr(b)) {}
-  };
-  using ret_t = ec_or<size_t>;
-  using op_t = async_op<read_some_bseq_impl>;
-
-  static void run(op_t &op) noexcept {
-    auto ret = async_syscall::readv(
-        op.ctx_, op.locals_->f_.get(), op.locals_->iovecs_.data(),
-        op.locals_->iovecs_.size(), op.locals_->f_.async_offset(),
-        op.yield_syscall(read_some_bseq_impl::finish));
-    if (!ret)
-      finish(op, ret.ec());
-  }
-
-  static void finish(op_t &op, ec_or<long> ret) noexcept {
-    if (!ret) {
-      op.locals_->f_.on_read(ret.ec());
-      op.complete(ret.ec());
-    } else {
-      size_t retv = static_cast<size_t>(ret.get());
-      op.locals_->f_.on_read(retv);
-      op.complete(static_cast<ret_t>(retv));
-    }
-  }
-};
-
-struct write_some_bseq_impl {
-  struct locals_t {
-    fd &f_;
-    vector<clinux::iovec> iovecs_;
-
-    template <class ConstBufferSeq>
-    locals_t(fd &f, ConstBufferSeq &b) noexcept
-        : f_(f), iovecs_(to_iovec_array_ptr(b)) {}
-  };
-  using ret_t = ec_or<size_t>;
-  using op_t = async_op<write_some_bseq_impl>;
-
-  static void run(op_t &op) noexcept {
-    auto ret = async_syscall::writev(
-        op.ctx_, op.locals_->f_.get(), op.locals_->iovecs_.data(),
-        op.locals_->iovecs_.size(), op.locals_->f_.async_offset(),
-        op.yield_syscall(write_some_bseq_impl::finish));
-    if (!ret)
-      finish(op, ret.ec());
-  }
-
-  static void finish(op_t &op, ec_or<long> ret) noexcept {
-    if (!ret) {
-      op.locals_->f_.on_write(ret.ec());
-      op.complete(ret.ec());
-    } else {
-      size_t retv = static_cast<size_t>(ret.get());
-      op.locals_->f_.on_write(retv);
-      op.complete(static_cast<ret_t>(retv));
-    }
-  }
-};
-
-template <class BufferSeq, enable_if_t<is_buffer_seq_v<BufferSeq>, int> = 0>
-inline void read_some(async_context &ctx, fd &f, BufferSeq &b,
+template <class Fd, class BufferSeq,
+          enable_if_t<is_buffer_seq_v<BufferSeq>, int> = 0>
+inline void read_some(Fd &f, BufferSeq &b,
                       callback<ec_or<size_t>> &&cb) noexcept {
-  using impl_t = read_some_bseq_impl;
-  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
-                   make_unique<impl_t::locals_t>(f, b))
-      .run();
+  __read_some_buffer_seq(f, b, forward<callback<ec_or<size_t>>>(cb));
 }
 
-template <class ConstBufferSeq,
+template <class Fd, class ConstBufferSeq,
           enable_if_t<is_buffer_seq_v<ConstBufferSeq>, int> = 0>
-inline void write_some(async_context &ctx, fd &f, ConstBufferSeq &b,
+inline void write_some(Fd &f, ConstBufferSeq &b,
                        callback<ec_or<size_t>> &&cb) noexcept {
-  using impl_t = write_some_bseq_impl;
-  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
-                   make_unique<impl_t::locals_t>(f, b))
-      .run();
+  __write_some_buffer_seq(f, b, forward<callback<ec_or<size_t>>>(cb));
 }
 
-inline void read_some(async_context &ctx, fd &f, const buffer_view b,
+template <class Fd>
+inline void read_some(Fd &f, const buffer_view b,
                       callback<ec_or<size_t>> &&cb) noexcept {
   array<buffer_view, 1> b_wrap{b};
-  read_some(ctx, f, b_wrap, forward<callback<ec_or<size_t>>>(cb));
+  read_some(f, b_wrap, forward<callback<ec_or<size_t>>>(cb));
 }
 
-inline void write_some(async_context &ctx, fd &f, const const_buffer_view b,
+template <class Fd>
+inline void write_some(Fd &f, const const_buffer_view b,
                        callback<ec_or<size_t>> &&cb) noexcept {
   array<const_buffer_view, 1> b_wrap{b};
-  write_some(ctx, f, b_wrap, forward<callback<ec_or<size_t>>>(cb));
+  write_some(f, b_wrap, forward<callback<ec_or<size_t>>>(cb));
 }
 
-struct read_buffer_impl {
+template <class Fd> struct read_buffer_impl {
   struct locals_t {
-    fd &f_;
+    Fd &f_;
     buffer_view remain_;
     size_t done_;
 
-    locals_t(fd &f, const buffer_view b) noexcept
+    locals_t(Fd &f, const buffer_view b) noexcept
         : f_(f), remain_(b), done_(0) {}
   };
   using ret_t = ec_or<size_t>;
@@ -126,8 +59,8 @@ struct read_buffer_impl {
   static void run(op_t &op) noexcept { do_read(op); }
 
   static void do_read(op_t &op) noexcept {
-    read_some(op.ctx_, op.locals_->f_, op.locals_->remain_,
-              op.yield<ec_or<size_t>>(continue_read));
+    read_some(op.locals_->f_, op.locals_->remain_,
+              op.template yield<ec_or<size_t>>(continue_read));
   }
 
   static void continue_read(op_t &op, ec_or<size_t> ret) noexcept {
@@ -137,12 +70,12 @@ struct read_buffer_impl {
     }
     size_t sz = static_cast<size_t>(ret.get());
     if (sz == 0) {
-      op.complete(static_cast<ret_t>(op.locals_->done_));
+      op.complete(op.locals_->done_);
       return;
     }
     op.locals_->done_ += sz;
     if (op.locals_->remain_.size() <= sz) {
-      op.complete(static_cast<ret_t>(op.locals_->done_));
+      op.complete(op.locals_->done_);
       return;
     }
     op.locals_->remain_ = op.locals_->remain_.subview(sz);
@@ -150,13 +83,13 @@ struct read_buffer_impl {
   }
 };
 
-struct write_buffer_impl {
+template <class Fd> struct write_buffer_impl {
   struct locals_t {
-    fd &f_;
+    Fd &f_;
     const_buffer_view remain_;
     size_t done_;
 
-    locals_t(fd &f, const const_buffer_view b) noexcept
+    locals_t(Fd &f, const const_buffer_view b) noexcept
         : f_(f), remain_(b), done_(0) {}
   };
   using ret_t = ec_or<size_t>;
@@ -165,8 +98,8 @@ struct write_buffer_impl {
   static void run(op_t &op) noexcept { do_write(op); }
 
   static void do_write(op_t &op) noexcept {
-    write_some(op.ctx_, op.locals_->f_, op.locals_->remain_,
-               op.yield<ec_or<size_t>>(continue_write));
+    write_some(op.locals_->f_, op.locals_->remain_,
+               op.template yield<ec_or<size_t>>(continue_write));
   }
 
   static void continue_write(op_t &op, ec_or<size_t> ret) noexcept {
@@ -177,7 +110,7 @@ struct write_buffer_impl {
     size_t sz = static_cast<size_t>(ret.get());
     op.locals_->done_ += sz;
     if (op.locals_->remain_.size() <= sz) {
-      op.complete(static_cast<ret_t>(op.locals_->done_));
+      op.complete(op.locals_->done_);
       return;
     }
     op.locals_->remain_ = op.locals_->remain_.subview(sz);
@@ -185,36 +118,38 @@ struct write_buffer_impl {
   }
 };
 
-inline void read(async_context &ctx, fd &f, const buffer_view b,
+template <class Fd>
+inline void read(Fd &f, const buffer_view b,
                  callback<ec_or<size_t>> &&cb) noexcept {
-  using impl_t = read_buffer_impl;
-  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
-                   make_unique<impl_t::locals_t>(f, b))
+  using impl_t = read_buffer_impl<Fd>;
+  async_op<impl_t>(f.context(), forward<callback<ec_or<size_t>>>(cb),
+                   make_unique<typename impl_t::locals_t>(f, b))
       .run();
 }
 
-inline void write(async_context &ctx, fd &f, const const_buffer_view b,
+template <class Fd>
+inline void write(Fd &f, const const_buffer_view b,
                   callback<ec_or<size_t>> &&cb) noexcept {
-  using impl_t = write_buffer_impl;
-  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
-                   make_unique<impl_t::locals_t>(f, b))
+  using impl_t = write_buffer_impl<Fd>;
+  async_op<impl_t>(f.context(), forward<callback<ec_or<size_t>>>(cb),
+                   make_unique<typename impl_t::locals_t>(f, b))
       .run();
 }
 
-template <class BufferSeq> struct read_bseq_impl {
+template <class Fd, class BufferSeq> struct read_bseq_impl {
   struct locals_t {
-    fd &f_;
+    Fd &f_;
 
     BufferSeq &bseq_;
     size_t done_;
 
     decltype(begin(declval<BufferSeq &>())) it_;
 
-    locals_t(fd &f, BufferSeq &bseq) noexcept
+    locals_t(Fd &f, BufferSeq &bseq) noexcept
         : f_(f), bseq_(bseq), done_(0), it_(begin(bseq_)) {}
   };
   using ret_t = ec_or<size_t>;
-  using op_t = async_op<read_bseq_impl<BufferSeq>>;
+  using op_t = async_op<read_bseq_impl<Fd, BufferSeq>>;
 
   static void run(op_t &op) noexcept { do_read(op); }
 
@@ -223,7 +158,7 @@ template <class BufferSeq> struct read_bseq_impl {
       op.complete(static_cast<ret_t>(op.locals_->done_));
       return;
     }
-    read(op.ctx_, op.locals_->f_, *op.locals_->it_,
+    read(op.locals_->f_, *op.locals_->it_,
          op.template yield<ec_or<size_t>>(continue_read));
   }
 
@@ -235,7 +170,7 @@ template <class BufferSeq> struct read_bseq_impl {
     size_t sz = ret.get();
     op.locals_->done_ += sz;
     if (sz < op.locals_->it_->size()) {
-      op.complete(static_cast<ret_t>(op.locals_->done_));
+      op.complete(op.locals_->done_);
       return;
     }
     op.locals_->it_++;
@@ -243,20 +178,20 @@ template <class BufferSeq> struct read_bseq_impl {
   }
 };
 
-template <class ConstBufferSeq> struct write_bseq_impl {
+template <class Fd, class ConstBufferSeq> struct write_bseq_impl {
   struct locals_t {
-    fd &f_;
+    Fd &f_;
 
     ConstBufferSeq &bseq_;
     size_t done_;
 
     decltype(begin(declval<ConstBufferSeq &>())) it_;
 
-    locals_t(fd &f, ConstBufferSeq &bseq) noexcept
+    locals_t(Fd &f, ConstBufferSeq &bseq) noexcept
         : f_(f), bseq_(bseq), done_(0), it_(begin(bseq_)) {}
   };
   using ret_t = ec_or<size_t>;
-  using op_t = async_op<write_bseq_impl<ConstBufferSeq>>;
+  using op_t = async_op<write_bseq_impl<Fd, ConstBufferSeq>>;
 
   static void run(op_t &op) noexcept { do_write(op); }
 
@@ -265,7 +200,7 @@ template <class ConstBufferSeq> struct write_bseq_impl {
       op.complete(static_cast<ret_t>(op.locals_->done_));
       return;
     }
-    write(op.ctx_, op.locals_->f_, *op.locals_->it_,
+    write(op.locals_->f_, *op.locals_->it_,
           op.template yield<ec_or<size_t>>(continue_write));
   }
 
@@ -281,21 +216,21 @@ template <class ConstBufferSeq> struct write_bseq_impl {
   }
 };
 
-template <class BufferSeq, enable_if_t<is_buffer_seq_v<BufferSeq>, int> = 0>
-inline void read(async_context &ctx, fd &f, BufferSeq &b,
-                 callback<ec_or<size_t>> &&cb) noexcept {
-  using impl_t = read_bseq_impl<BufferSeq>;
-  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
+template <class Fd, class BufferSeq,
+          enable_if_t<is_buffer_seq_v<BufferSeq>, int> = 0>
+inline void read(Fd &f, BufferSeq &b, callback<ec_or<size_t>> &&cb) noexcept {
+  using impl_t = read_bseq_impl<Fd, BufferSeq>;
+  async_op<impl_t>(f.context(), forward<callback<ec_or<size_t>>>(cb),
                    make_unique<typename impl_t::locals_t>(f, b))
       .run();
 }
 
-template <class ConstBufferSeq,
+template <class Fd, class ConstBufferSeq,
           enable_if_t<is_buffer_seq_v<ConstBufferSeq>, int> = 0>
-inline void write(async_context &ctx, fd &f, ConstBufferSeq &b,
+inline void write(Fd &f, ConstBufferSeq &b,
                   callback<ec_or<size_t>> &&cb) noexcept {
-  using impl_t = write_bseq_impl<ConstBufferSeq>;
-  async_op<impl_t>(ctx, forward<callback<ec_or<size_t>>>(cb),
+  using impl_t = write_bseq_impl<Fd, ConstBufferSeq>;
+  async_op<impl_t>(f.context(), forward<callback<ec_or<size_t>>>(cb),
                    make_unique<typename impl_t::locals_t>(f, b))
       .run();
 }

@@ -19,7 +19,7 @@
 #include <vector>
 
 namespace iasr {
-using byte = uint8_t;
+using byte = char;
 using fu2::function;
 using fu2::unique_function;
 using gsl::dynamic_extent;

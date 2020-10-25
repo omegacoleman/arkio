@@ -1,7 +1,6 @@
 #include <iasr/buffer/buffer.hpp>
 #include <iasr/buffer/buffer_view.hpp>
 #include <iasr/error/ec_or.hpp>
-#include <iasr/io/stdio.hpp>
 #include <iasr/io/sync.hpp>
 #include <iasr/net/address.hpp>
 #include <iasr/net/tcp/sync.hpp>
@@ -9,7 +8,6 @@
 int main(void) {
   using iasr::buffer;
   using iasr::buffer_view;
-  using iasr::fd_stdout;
   using iasr::panic_on_ec;
   namespace sync = iasr::sync;
   namespace net = iasr::net;
@@ -26,6 +24,6 @@ int main(void) {
   for (;;) {
     buffer rd_buf{1024};
     size_t sz = panic_on_ec(sync::read_some(s, rd_buf));
-    panic_on_ec(sync::write(fd_stdout, buffer_view(rd_buf.data(), sz)));
+    std::cout.write(rd_buf.data(), sz);
   }
 }
