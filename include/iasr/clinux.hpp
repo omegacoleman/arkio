@@ -37,6 +37,7 @@ using ::mkostemp;
 using ::ntohs;
 using ::off_t;
 using ::open;
+using ::pipe2;
 using ::preadv2;
 using ::pwritev2;
 using ::read;

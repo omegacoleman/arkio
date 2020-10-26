@@ -2,6 +2,7 @@
 - [x] split seekable and unseekable fd
 - [x] bind fd to async contexts
 - [ ] better tests
+- [ ] pipefd & timerfd
 - [ ] streambuf migration
 - [ ] multithreading
 

@@ -62,7 +62,7 @@ private:
                     this->exit_error(ret.ec());
                     return;
                   }
-                  buffer b{sizeof(uint64_t)};
+                  array<char, sizeof(uint64_t)> b;
                   auto read_ret = clinux::read(waker_evfd_, b.data(), b.size());
                   if (read_ret == -1) {
                     this->exit_error(clinux::errno_ec());

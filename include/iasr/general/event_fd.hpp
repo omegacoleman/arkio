@@ -8,7 +8,7 @@
 namespace iasr {
 class event_fd : public nonseekable_fd {
 protected:
-  event_fd(int fd_int) : seekable_fd(fd_int) {}
+  event_fd(int fd_int) : nonseekable_fd(fd_int) {}
 
 private:
   static ec_or<event_fd> __create(async_context *ctx, unsigned int count,
