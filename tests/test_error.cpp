@@ -28,9 +28,11 @@ TEST(ec_or, retrieve_err) {
 
 ec_or<pair<int, int>> vec2_divide_by(pair<int, int> lhs, pair<int, int> rhs) {
   auto first = divide_by(lhs.first, rhs.first);
-  IASR_PASS_EC_ON(first);
+  if (!first)
+    return first.ec();
   auto second = divide_by(lhs.second, rhs.second);
-  IASR_PASS_EC_ON(second);
+  if (!second)
+    return second.ec();
   return make_pair(first.get(), second.get());
 }
 

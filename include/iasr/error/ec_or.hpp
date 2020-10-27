@@ -24,11 +24,6 @@ public:
   explicit operator bool() const noexcept { return !ec_; }
 };
 
-#define IASR_PASS_EC_ON(__EC_OR)                                               \
-  if (!(__EC_OR)) {                                                            \
-    return __EC_OR.ec();                                                       \
-  }
-
 namespace detail {
 #if defined(__clang__)
 #define NO_WTERMINATE_START                                                    \

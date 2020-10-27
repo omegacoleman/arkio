@@ -43,7 +43,8 @@ inline ec_or<size_t> read(Fd &f, const buffer_view b) noexcept {
   while (b.size() > done) {
     buffer_view bv_remain{b.data() + done, b.data() + b.size()};
     auto ret = read_some(f, bv_remain);
-    IASR_PASS_EC_ON(ret);
+    if (!ret)
+      return ret.ec();
     size_t ret_int = ret.get();
     if (ret_int == 0) {
       break;
@@ -59,7 +60,8 @@ inline ec_or<size_t> write(Fd &f, const const_buffer_view b) noexcept {
   while (b.size() > done) {
     const_buffer_view bv_remain{b.data() + done, b.data() + b.size()};
     auto ret = write_some(f, bv_remain);
-    IASR_PASS_EC_ON(ret);
+    if (!ret)
+      return ret.ec();
     done += ret.get();
   }
   return done;
@@ -71,7 +73,8 @@ inline ec_or<size_t> read(Fd &f, BufferSeq &b) noexcept {
   size_t done = 0;
   for (auto &it : b) {
     auto ret = read(f, it);
-    IASR_PASS_EC_ON(ret);
+    if (!ret)
+      return ret.ec();
     size_t ret_int = ret.get();
     if (ret_int < it.size()) {
       break;
@@ -87,7 +90,8 @@ inline ec_or<size_t> write(Fd &f, ConstBufferSeq &b) noexcept {
   size_t done = 0;
   for (auto &it : b) {
     auto ret = write(f, it);
-    IASR_PASS_EC_ON(ret);
+    if (!ret)
+      return ret.ec();
     done += ret.get();
   }
   return done;

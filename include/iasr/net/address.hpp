@@ -44,7 +44,8 @@ public:
   static ec_or<string> to_string(const_sockaddr_ptr_t sa) noexcept {
     ostringstream oss;
     auto host_ret = host(sa);
-    IASR_PASS_EC_ON(host_ret);
+    if (!host_ret)
+      return host_ret.ec();
     string host_s = host_ret.get();
     oss << host_s << ":" << port(sa);
     return oss.str();
@@ -86,7 +87,8 @@ public:
   static ec_or<string> to_string(const_sockaddr_ptr_t sa) noexcept {
     ostringstream oss;
     auto host_ret = host(sa);
-    IASR_PASS_EC_ON(host_ret);
+    if (!host_ret)
+      return host_ret.ec();
     string host_s = host_ret.get();
     oss << "[" << host_s << "]:" << port(sa);
     return oss.str();

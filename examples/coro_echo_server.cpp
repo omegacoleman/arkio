@@ -17,29 +17,31 @@ using iasr::async_context;
 using iasr::buffer;
 using iasr::buffer_view;
 using iasr::ec_or;
+using iasr::error_code;
 using iasr::panic_on_ec;
 using iasr::task;
 namespace coro = iasr::coro;
 namespace net = iasr::net;
 namespace tcp = net::tcp;
 
+void handle_conn_err(error_code ec) { std::cerr << ec.message() << std::endl; }
+
 task<void> handle_conn(tcp::socket s) {
   for (;;) {
     buffer buf{1024};
+
     auto ret = co_await coro::read_some(s, buf);
-    if (!ret) {
-      std::cerr << ret.ec().message() << std::endl;
-      break;
-    }
+    if (!ret)
+      co_return handle_conn_err(ret.ec());
+
     size_t sz = ret.get();
     if (sz == 0)
       break;
+
     auto wr_ret =
         co_await coro::write(s, buffer_view{buf.data(), buf.data() + sz});
-    if (!wr_ret) {
-      std::cerr << wr_ret.ec().message() << std::endl;
-      break;
-    }
+    if (!wr_ret)
+      co_return handle_conn_err(wr_ret.ec());
   }
 }
 

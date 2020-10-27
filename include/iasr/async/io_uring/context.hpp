@@ -37,7 +37,8 @@ private:
             >
   ec_or<token_t> base_add_sqe(const PrepSqeCallable &prep_sqe) noexcept {
     auto sqe_ret = r_.get_sqe();
-    IASR_PASS_EC_ON(sqe_ret);
+    if (!sqe_ret)
+      return sqe_ret.ec();
     sqe_ref sqe = sqe_ret.get();
     prep_sqe(sqe);
     token_t ret = callbacks_idx_;
@@ -139,7 +140,8 @@ public:
     lock_guard<mutex> g_submission(m_submission_);
     lock_guard<mutex> g_callbacks(m_callbacks_);
     auto ret = base_add_sqe(prep_sqe);
-    IASR_PASS_EC_ON(ret);
+    if (!ret)
+      return ret.ec();
     token_t tok = ret.get();
     callbacks_[tok] = forward<callback_t>(callback);
     return tok;
