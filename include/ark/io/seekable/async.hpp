@@ -8,7 +8,6 @@
 #include <ark/async/io_uring/async_syscall.hpp>
 #include <ark/buffer/sequence.hpp>
 #include <ark/buffer/traits.hpp>
-#include <ark/error/ec_or.hpp>
 #include <ark/io/completion_condition.hpp>
 #include <ark/io/iovecs.hpp>
 #include <ark/io/seekable/seekable_fd.hpp>
@@ -38,7 +37,7 @@ template <class CompletionCondition> struct seekable_read_buffer_sequence_impl {
       }
     }
   };
-  using ret_t = ec_or<size_t>;
+  using ret_t = result<size_t>;
   using op_t = async_op<seekable_read_buffer_sequence_impl>;
 
   static void run(op_t &op) noexcept {
@@ -58,14 +57,14 @@ template <class CompletionCondition> struct seekable_read_buffer_sequence_impl {
     auto ret = async_syscall::readv(ctx, f_get, iov_d, iov_s, off,
                                     op.yield_syscall(go_on));
     if (!ret)
-      op.complete(ret.ec());
+      op.complete(ret.error());
   }
 
-  static void go_on(op_t &op, ec_or<long> ret) noexcept {
+  static void go_on(op_t &op, result<long> ret) noexcept {
     if (!ret) {
-      return op.complete(ret.ec());
+      return op.complete(ret.error());
     }
-    size_t ret_sz = static_cast<size_t>(ret.get());
+    size_t ret_sz = static_cast<size_t>(ret.value());
     if (ret_sz == 0) { // eof
       return op.complete(op.locals_->done_sz_);
     }
@@ -98,7 +97,7 @@ struct seekable_write_buffer_sequence_impl {
       }
     }
   };
-  using ret_t = ec_or<size_t>;
+  using ret_t = result<size_t>;
   using op_t = async_op<seekable_write_buffer_sequence_impl>;
 
   static void run(op_t &op) noexcept {
@@ -118,14 +117,14 @@ struct seekable_write_buffer_sequence_impl {
     auto ret = async_syscall::writev(ctx, f_get, iov_d, iov_s, off,
                                      op.yield_syscall(go_on));
     if (!ret)
-      op.complete(ret.ec());
+      op.complete(ret.error());
   }
 
-  static void go_on(op_t &op, ec_or<long> ret) noexcept {
+  static void go_on(op_t &op, result<long> ret) noexcept {
     if (!ret) {
-      return op.complete(ret.ec());
+      return op.complete(ret.error());
     }
-    size_t ret_sz = static_cast<size_t>(ret.get());
+    size_t ret_sz = static_cast<size_t>(ret.value());
     op.locals_->done_sz_ += ret_sz;
     op.locals_->f_.feed(ret_sz);
     run(op);
@@ -135,10 +134,10 @@ struct seekable_write_buffer_sequence_impl {
 template <class MutableBufferSequence, class CompletionCondition>
 inline void read(seekable_fd &f, const MutableBufferSequence &b,
                  CompletionCondition cond,
-                 callback<ec_or<size_t>> &&cb) noexcept {
+                 callback<result<size_t>> &&cb) noexcept {
   static_assert(is_mutable_buffer_sequence_v<MutableBufferSequence>);
   using impl_t = seekable_read_buffer_sequence_impl<CompletionCondition>;
-  async_op<impl_t>(f.context(), forward<callback<ec_or<size_t>>>(cb),
+  async_op<impl_t>(f.context(), forward<callback<result<size_t>>>(cb),
                    make_unique<typename impl_t::locals_t>(f, b, cond))
       .run();
 }
@@ -146,24 +145,24 @@ inline void read(seekable_fd &f, const MutableBufferSequence &b,
 template <class ConstBufferSequence, class CompletionCondition>
 inline void write(seekable_fd &f, const ConstBufferSequence &b,
                   CompletionCondition cond,
-                  callback<ec_or<size_t>> &&cb) noexcept {
+                  callback<result<size_t>> &&cb) noexcept {
   static_assert(is_const_buffer_sequence_v<ConstBufferSequence>);
   using impl_t = seekable_write_buffer_sequence_impl<CompletionCondition>;
-  async_op<impl_t>(f.context(), forward<callback<ec_or<size_t>>>(cb),
+  async_op<impl_t>(f.context(), forward<callback<result<size_t>>>(cb),
                    make_unique<typename impl_t::locals_t>(f, b, cond))
       .run();
 }
 
 template <class MutableBufferSequence>
 inline void read(seekable_fd &f, const MutableBufferSequence &b,
-                 callback<ec_or<size_t>> &&cb) noexcept {
-  read(f, b, transfer_all(), forward<callback<ec_or<size_t>>>(cb));
+                 callback<result<size_t>> &&cb) noexcept {
+  read(f, b, transfer_all(), forward<callback<result<size_t>>>(cb));
 }
 
 template <class ConstBufferSequence>
 inline void write(seekable_fd &f, const ConstBufferSequence &b,
-                  callback<ec_or<size_t>> &&cb) noexcept {
-  write(f, b, transfer_all(), forward<callback<ec_or<size_t>>>(cb));
+                  callback<result<size_t>> &&cb) noexcept {
+  write(f, b, transfer_all(), forward<callback<result<size_t>>>(cb));
 }
 
 } // namespace async

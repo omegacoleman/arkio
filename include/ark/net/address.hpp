@@ -3,8 +3,6 @@
 #include <ark/bindings.hpp>
 #include <ark/clinux.hpp>
 
-#include <ark/error/ec_or.hpp>
-
 namespace ark {
 namespace net {
 
@@ -15,7 +13,7 @@ public:
   using sockaddr_ptr_t = clinux::sockaddr_in *;
   using const_sockaddr_ptr_t = const clinux::sockaddr_in *;
 
-  static ec_or<string> host(const_sockaddr_ptr_t sa) noexcept {
+  static result<string> host(const_sockaddr_ptr_t sa) noexcept {
     char buff[16];
     const char *s =
         clinux::inet_ntop(AF_INET, &sa->sin_addr, buff, sizeof(buff));
@@ -25,11 +23,11 @@ public:
     return {s};
   }
 
-  static error_code host(sockaddr_ptr_t sa, string host_s) noexcept {
+  static result<void> host(sockaddr_ptr_t sa, string host_s) noexcept {
     int ret = clinux::inet_pton(address_family, host_s.c_str(), &sa->sin_addr);
     if (ret <= 0)
       return error_code(EINVAL, system_category());
-    return {};
+    return success();
   }
 
   static unsigned short port(const_sockaddr_ptr_t sa) noexcept {
@@ -40,12 +38,9 @@ public:
     sa->sin_port = clinux::htons(p);
   }
 
-  static ec_or<string> to_string(const_sockaddr_ptr_t sa) noexcept {
+  static result<string> to_string(const_sockaddr_ptr_t sa) noexcept {
     ostringstream oss;
-    auto host_ret = host(sa);
-    if (!host_ret)
-      return host_ret.ec();
-    string host_s = host_ret.get();
+    OUTCOME_TRY(host_s, host(sa));
     oss << host_s << ":" << port(sa);
     return oss.str();
   }
@@ -58,7 +53,7 @@ public:
   using sockaddr_ptr_t = clinux::sockaddr_in6 *;
   using const_sockaddr_ptr_t = const clinux::sockaddr_in6 *;
 
-  static ec_or<string> host(const_sockaddr_ptr_t sa) noexcept {
+  static result<string> host(const_sockaddr_ptr_t sa) noexcept {
     char buff[64];
     const char *s =
         clinux::inet_ntop(AF_INET6, &sa->sin6_addr, buff, sizeof(buff));
@@ -68,11 +63,11 @@ public:
     return {s};
   }
 
-  static error_code host(sockaddr_ptr_t sa, string host_s) noexcept {
+  static result<void> host(sockaddr_ptr_t sa, string host_s) noexcept {
     int ret = clinux::inet_pton(address_family, host_s.c_str(), &sa->sin6_addr);
     if (ret <= 0)
       return error_code(EINVAL, system_category());
-    return {};
+    return success();
   }
 
   static unsigned short port(const_sockaddr_ptr_t sa) noexcept {
@@ -83,12 +78,9 @@ public:
     sa->sin6_port = clinux::htons(p);
   }
 
-  static ec_or<string> to_string(const_sockaddr_ptr_t sa) noexcept {
+  static result<string> to_string(const_sockaddr_ptr_t sa) noexcept {
     ostringstream oss;
-    auto host_ret = host(sa);
-    if (!host_ret)
-      return host_ret.ec();
-    string host_s = host_ret.get();
+    OUTCOME_TRY(host_s, host(sa));
     oss << "[" << host_s << "]:" << port(sa);
     return oss.str();
   }
@@ -98,30 +90,33 @@ template <class Impl> class address_with_family;
 
 class address {
 protected:
-  clinux::sockaddr sa_;
+  clinux::sockaddr_storage sa_;
 
 public:
-  address() { sa_.sa_family = AF_UNSPEC; }
-  address(clinux::sockaddr sa) : sa_(sa) {}
+  address() { sa_ptr()->sa_family = AF_UNSPEC; }
 
   template <class Impl> friend class address_with_family;
 
   clinux::sa_family_t sa_family() const noexcept { return sa_ptr()->sa_family; }
-  clinux::sockaddr *sa_ptr() noexcept { return addressof(sa_); }
-  const clinux::sockaddr *sa_ptr() const noexcept { return addressof(sa_); }
-  clinux::socklen_t sa_len() const noexcept {
-    return static_cast<clinux::socklen_t>(sizeof(sa_));
+  clinux::sockaddr *sa_ptr() noexcept {
+    return reinterpret_cast<clinux::sockaddr *>(addressof(sa_));
   }
+  const clinux::sockaddr *sa_ptr() const noexcept {
+    return reinterpret_cast<const clinux::sockaddr *>(addressof(sa_));
+  }
+  clinux::socklen_t sa_len() const noexcept { return sizeof(sa_); }
 };
 
 template <class Impl> class address_with_family : public address {
-private:
-  using address::address;
-
 public:
   using size_type = clinux::socklen_t;
 
-  address_with_family() { address::sa_ptr()->sa_family = Impl::address_family; }
+  address_with_family() : address() {
+    address::sa_ptr()->sa_family = Impl::address_family;
+  }
+  address_with_family(const address &addr) : address(addr) {
+    Expects(address::sa_ptr()->sa_family == Impl::address_family);
+  }
 
   typename Impl::sockaddr_ptr_t sa_ptr() noexcept {
     return reinterpret_cast<typename Impl::sockaddr_ptr_t>(address::sa_ptr());
@@ -134,15 +129,15 @@ public:
 
   address to_address() noexcept { return *(this); }
 
-  static ec_or<address_with_family<Impl>> from_address(address addr) noexcept {
+  static result<address_with_family<Impl>> from_address(address addr) noexcept {
     if (addr.sa_ptr()->sa_family != Impl::address_family)
       return error_code(EAFNOSUPPORT, system_category());
-    return address_with_family<Impl>{addr.sa_};
+    return address_with_family<Impl>{addr};
   }
 
-  ec_or<string> host() const noexcept { return Impl::host(sa_ptr()); }
+  result<string> host() const noexcept { return Impl::host(sa_ptr()); }
 
-  error_code host(string host_s) noexcept {
+  result<void> host(string host_s) noexcept {
     return Impl::host(sa_ptr(), move(host_s));
   }
 
@@ -150,23 +145,21 @@ public:
 
   void port(unsigned short p) noexcept { Impl::port(sa_ptr(), p); }
 
-  ec_or<string> to_string() const noexcept { return Impl::to_string(sa_ptr()); }
+  result<string> to_string() const noexcept {
+    return Impl::to_string(sa_ptr());
+  }
 };
 
 using inet_address = address_with_family<in_address_impl>;
 using inet6_address = address_with_family<in6_address_impl>;
 
-ec_or<string> to_string(const address &addr) {
+result<string> to_string(const address &addr) {
   if (addr.sa_family() == AF_INET) {
-    auto ret = inet_address::from_address(addr);
-    if (!ret)
-      return ret.ec();
-    return ret.get().to_string();
+    OUTCOME_TRY(ret, inet_address::from_address(addr));
+    return ret.to_string();
   } else if (addr.sa_family() == AF_INET6) {
-    auto ret = inet6_address::from_address(addr);
-    if (!ret)
-      return ret.ec();
-    return ret.get().to_string();
+    OUTCOME_TRY(ret, inet6_address::from_address(addr));
+    return ret.to_string();
   }
   return error_code(EAFNOSUPPORT, system_category());
 }

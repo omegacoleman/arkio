@@ -1,58 +1,62 @@
 #include <ark/buffer/buffer.hpp>
 #include <ark/coroutine/co_async.hpp>
 #include <ark/coroutine/task.hpp>
-#include <ark/error/ec_or.hpp>
 #include <ark/general/normal_file.hpp>
 #include <ark/io/coro.hpp>
+#include <ark/misc/context_exit_guard.hpp>
 #include <iostream>
 
-using ark::async_context;
-using ark::buffer;
-using ark::ec_or;
-using ark::error_code;
-using ark::mutable_buffer;
-using ark::normal_file;
-using ark::panic_on_ec;
-using ark::task;
-using ark::transfer_at_least;
-namespace coro = ark::coro;
+namespace program {
 
-task<error_code> to_stdout(normal_file &f) {
+using namespace ark;
+
+task<result<void>> to_stdout(normal_file &f) {
   std::array<char, 1024> buf;
   for (;;) {
-    auto read_ret = co_await coro::read(f, buffer(buf), transfer_at_least(1));
-    if (!read_ret)
-      co_return read_ret.ec();
-    size_t sz = read_ret.get();
+    OUTCOME_CO_TRY(sz,
+                   co_await coro::read(f, buffer(buf), transfer_at_least(1)));
     if (sz == 0) {
-      co_return error_code{};
+      co_return success();
     }
     std::cout.write(buf.data(), sz);
     std::cout.flush();
   }
 }
 
-task<void> coro_cat(async_context &ctx,
-                    const std::vector<std::string> &filenames) {
+task<result<void>> coro_cat(async_context &ctx,
+                            const std::vector<std::string> &filenames) {
+  context_exit_guard g_(ctx);
 
   for (auto &filename : filenames) {
-    normal_file f{panic_on_ec(normal_file::open(ctx, filename, O_RDONLY))};
-    panic_on_ec(co_await to_stdout(f));
+    OUTCOME_CO_TRY(f, normal_file::open(ctx, filename, O_RDONLY));
+    OUTCOME_CO_TRY(co_await to_stdout(f));
   }
 
-  ctx.exit();
+  co_return success();
 }
 
-int main(int argc, char **argv) {
+result<void> run(int argc, char **argv) {
   async_context ctx;
-  panic_on_ec(ctx.init());
+  OUTCOME_TRY(ctx.init());
 
   std::vector<std::string> filenames{};
   for (int i = 1; i < argc; ++i)
     filenames.emplace_back(argv[i]);
 
-  co_async(coro_cat(ctx, filenames));
-  ctx.run();
+  auto fut = co_async(coro_cat(ctx, filenames));
+  OUTCOME_TRY(ctx.run());
+  OUTCOME_TRY(fut.get());
 
+  return success();
+}
+
+} // namespace program
+
+int main(int argc, char **argv) {
+  auto ret = program::run(argc, argv);
+  if (ret.has_error()) {
+    std::cerr << "error : " << ret.error().message() << std::endl;
+    std::abort();
+  }
   return 0;
 }

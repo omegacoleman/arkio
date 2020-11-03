@@ -5,8 +5,6 @@
 #include <ark/bindings.hpp>
 #include <ark/clinux.hpp>
 
-#include <ark/error/ec_or.hpp>
-
 namespace ark {
 namespace io_uring_async {
 namespace liburing {
@@ -172,7 +170,7 @@ public:
 
   void *get_data() noexcept { return liburing::io_uring_cqe_get_data(cqe_); }
 
-  template <typename ResType> ec_or<ResType> to_ec_or() noexcept {
+  template <typename ResType> result<ResType> to_result() noexcept {
     if (cqe_->res < 0) {
       return error_code{-cqe_->res, system_category()};
     }
@@ -193,17 +191,17 @@ private:
 public:
   io_uring() noexcept {}
 
-  error_code queue_init(unsigned entries, unsigned flags) noexcept {
+  result<void> queue_init(unsigned entries, unsigned flags) noexcept {
     Expects(!inited_);
     int ret = liburing::io_uring_queue_init(entries, &ring_, flags);
     if (ret < 0) {
       return {ret, system_category()};
     }
     inited_ = true;
-    return {};
+    return success();
   }
 
-  ec_or<sqe_ref> get_sqe() noexcept {
+  result<sqe_ref> get_sqe() noexcept {
     Expects(inited_);
     liburing::io_uring_sqe *ret = liburing::io_uring_get_sqe(&ring_);
     if (ret != nullptr) {
@@ -217,14 +215,14 @@ public:
     return liburing::io_uring_submit(&ring_);
   }
 
-  error_code wait() noexcept {
+  result<void> wait() noexcept {
     Expects(inited_);
     liburing::io_uring_cqe *p_discarded;
     int ret = liburing::io_uring_wait_cqe(&ring_, &p_discarded);
     if (ret < 0) {
       return {-ret, system_category()};
     }
-    return {};
+    return success();
   }
 
   template <class OutputIt>

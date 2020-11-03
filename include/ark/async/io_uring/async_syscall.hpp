@@ -5,13 +5,12 @@
 
 #include <ark/async/callback.hpp>
 #include <ark/async/io_uring/io_uring.hpp>
-#include <ark/error/ec_or.hpp>
 
 namespace ark {
 namespace io_uring_async {
 namespace syscall {
 template <class UringContext>
-inline ec_or<typename UringContext::token_t>
+inline result<typename UringContext::token_t>
 read(UringContext &ctx, int fd, void *buf, unsigned nbytes,
      clinux::off_t offset, syscall_callback_t &&cb) noexcept {
   return ctx.add_sqe(
@@ -22,7 +21,7 @@ read(UringContext &ctx, int fd, void *buf, unsigned nbytes,
 }
 
 template <class UringContext>
-inline ec_or<typename UringContext::token_t>
+inline result<typename UringContext::token_t>
 write(UringContext &ctx, int fd, const void *buf, unsigned nbytes,
       clinux::off_t offset, syscall_callback_t &&cb) noexcept {
   return ctx.add_sqe(
@@ -33,7 +32,7 @@ write(UringContext &ctx, int fd, const void *buf, unsigned nbytes,
 }
 
 template <class UringContext>
-inline ec_or<typename UringContext::token_t>
+inline result<typename UringContext::token_t>
 connect(UringContext &ctx, int fd, const clinux::sockaddr *addr,
         clinux::socklen_t addrlen, syscall_callback_t &&cb) noexcept {
   return ctx.add_sqe([&ctx, fd, addr, addrlen](
@@ -42,7 +41,7 @@ connect(UringContext &ctx, int fd, const clinux::sockaddr *addr,
 }
 
 template <class UringContext>
-inline ec_or<typename UringContext::token_t>
+inline result<typename UringContext::token_t>
 readv(UringContext &ctx, int fd, const clinux::iovec *iovecs, unsigned nr_vecs,
       clinux::off_t offset, syscall_callback_t &&cb) noexcept {
   return ctx.add_sqe(
@@ -53,7 +52,7 @@ readv(UringContext &ctx, int fd, const clinux::iovec *iovecs, unsigned nr_vecs,
 }
 
 template <class UringContext>
-inline ec_or<typename UringContext::token_t>
+inline result<typename UringContext::token_t>
 writev(UringContext &ctx, int fd, const clinux::iovec *iovecs, unsigned nr_vecs,
        clinux::off_t offset, syscall_callback_t &&cb) noexcept {
   return ctx.add_sqe(
@@ -64,7 +63,7 @@ writev(UringContext &ctx, int fd, const clinux::iovec *iovecs, unsigned nr_vecs,
 }
 
 template <class UringContext>
-inline ec_or<typename UringContext::token_t>
+inline result<typename UringContext::token_t>
 accept(UringContext &ctx, int fd, clinux::sockaddr *addr,
        clinux::socklen_t *addrlen, int flags,
        syscall_callback_t &&cb) noexcept {

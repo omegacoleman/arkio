@@ -1,22 +1,17 @@
-#include <functional>
 #include <ark/buffer/buffer.hpp>
-#include <ark/error/ec_or.hpp>
 #include <ark/io/async.hpp>
 #include <ark/net/address.hpp>
 #include <ark/net/tcp/acceptor.hpp>
 #include <ark/net/tcp/async.hpp>
 #include <ark/net/tcp/general.hpp>
 #include <ark/net/tcp/socket.hpp>
+#include <functional>
 
 #define PRINT_ACCESS_LOG
 
-using ark::async_context;
-using ark::buffer;
-using ark::ec_or;
-using ark::panic_on_ec;
-using ark::transfer_at_least;
-namespace async = ark::async;
-namespace net = ark::net;
+namespace program {
+
+using namespace ark;
 namespace tcp = net::tcp;
 
 struct echo_service : public std::enable_shared_from_this<echo_service> {
@@ -38,8 +33,8 @@ struct echo_service : public std::enable_shared_from_this<echo_service> {
   std::string peer_name() {
     auto ret = to_string(addr_);
     if (!ret)
-      return std::string{"["} + ret.ec().message() + "]";
-    return ret.get();
+      return std::string{"["} + ret.error().message() + "]";
+    return ret.value();
   }
 
 #else
@@ -52,20 +47,22 @@ struct echo_service : public std::enable_shared_from_this<echo_service> {
                           std::placeholders::_1));
   }
 
-  void handle_write(ec_or<size_t> ret) {
-    if (!ret) {
-      std::cerr << ret.ec().message() << std::endl;
+  void handle_error(error_code ec) { std::cerr << ec.message() << std::endl; }
+
+  void handle_write(result<size_t> ret) {
+    if (ret.has_error()) {
+      handle_error(ret.error());
       return;
     }
     do_echo();
   }
 
-  void handle_read(ec_or<size_t> ret) {
-    if (!ret) {
-      std::cerr << ret.ec().message() << std::endl;
+  void handle_read(result<size_t> ret) {
+    if (ret.has_error()) {
+      handle_error(ret.error());
       return;
     }
-    size_t sz = ret.get();
+    size_t sz = ret.value();
     if (sz == 0)
       return;
     async::write(s_, buffer(buf_, sz),
@@ -92,15 +89,16 @@ struct echo_server : public std::enable_shared_from_this<echo_server> {
 #endif
   }
 
-  void handle_connection(ec_or<tcp::socket> ret) {
+  void handle_connection(result<tcp::socket> ret) {
     if (!ret) {
-      std::cerr << ret.ec().message() << std::endl;
+      ac_.context().exit(ret.as_failure());
       return;
     }
 #ifdef PRINT_ACCESS_LOG
-    auto svc = std::make_shared<echo_service>(ret.get(), std::move(addr_));
+    auto svc = std::make_shared<echo_service>(std::move(ret.value()),
+                                              std::move(addr_));
 #else
-    auto svc = std::make_shared<echo_service>(ret.get());
+    auto svc = std::make_shared<echo_service>(std::move(ret.value()));
 #endif
     svc->do_echo();
 
@@ -108,22 +106,32 @@ struct echo_server : public std::enable_shared_from_this<echo_server> {
   }
 };
 
-int main(void) {
+result<void> run() {
   async_context ctx;
-  panic_on_ec(ctx.init());
+  OUTCOME_TRY(ctx.init());
 
   net::inet_address ep;
-  ep.host("127.0.0.1");
+  OUTCOME_TRY(ep.host("127.0.0.1"));
   ep.port(8080);
 
-  tcp::acceptor ac{panic_on_ec(tcp::acceptor::create(ctx))};
-  panic_on_ec(tcp::bind(ac, ep));
-  panic_on_ec(tcp::listen(ac));
+  OUTCOME_TRY(ac, tcp::acceptor::create(ctx));
+  OUTCOME_TRY(tcp::bind(ac, ep));
+  OUTCOME_TRY(tcp::listen(ac));
 
   auto srv = std::make_shared<echo_server>(std::move(ac));
   srv->run();
 
-  ctx.run();
+  OUTCOME_TRY(ctx.run());
+  return success();
+}
 
+} // namespace program
+
+int main(void) {
+  auto ret = program::run();
+  if (ret.has_error()) {
+    std::cerr << "error : " << ret.error().message() << std::endl;
+    std::abort();
+  }
   return 0;
 }

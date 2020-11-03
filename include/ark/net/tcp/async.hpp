@@ -15,14 +15,16 @@ namespace tcp {
 namespace async {
 
 inline void connect(socket &f, const address &endpoint,
-                    callback<error_code> &&cb) noexcept {
-  async_syscall::connect(
+                    callback<result<void>> &&cb) noexcept {
+  auto ret = async_syscall::connect(
       f.context(), f.get(), endpoint.sa_ptr(), endpoint.sa_len(),
-      [cb(forward<callback<error_code>>(cb))](ec_or<long> ret) mutable {
+      [cb(forward<callback<result<void>>>(cb))](result<long> ret) mutable {
         if (!ret)
-          cb(ret.ec());
-        cb({});
+          cb(ret.error());
+        cb(success());
       });
+  if (ret.has_error())
+    cb(ret.as_failure());
 }
 
 struct accept_with_address_impl {
@@ -34,41 +36,45 @@ struct accept_with_address_impl {
 
     locals_t(acceptor &f, address &endpoint) : f_(f), endpoint_(endpoint) {}
   };
-  using ret_t = ec_or<socket>;
+  using ret_t = result<socket>;
   using op_t = async_op<accept_with_address_impl>;
 
   static void run(op_t &op) noexcept {
-    async_syscall::accept(op.ctx_, op.locals_->f_.get(),
-                          op.locals_->endpoint_.sa_ptr(),
-                          addressof(op.locals_->addrlen_buf), 0,
-                          op.yield_syscall(accept_with_address_impl::finish));
+    auto ret = async_syscall::accept(
+        op.ctx_, op.locals_->f_.get(), op.locals_->endpoint_.sa_ptr(),
+        addressof(op.locals_->addrlen_buf), 0,
+        op.yield_syscall(accept_with_address_impl::finish));
+    if (ret.has_error())
+      return op.complete(ret.as_failure());
   }
 
-  static void finish(op_t &op, ec_or<long> ret) noexcept {
+  static void finish(op_t &op, result<long> ret) noexcept {
     if (!ret) {
-      op.complete(ret.ec());
+      op.complete(ret.error());
     }
-    op.complete(wrap_accepted_socket(&op.ctx_, static_cast<int>(ret.get())));
+    op.complete(wrap_accepted_socket(&op.ctx_, static_cast<int>(ret.value())));
   }
 };
 
 inline void accept(acceptor &srv, address &endpoint,
-                   callback<ec_or<socket>> &&cb) noexcept {
+                   callback<result<socket>> &&cb) noexcept {
   using impl_t = accept_with_address_impl;
-  async_op<impl_t>(srv.context(), forward<callback<ec_or<socket>>>(cb),
+  async_op<impl_t>(srv.context(), forward<callback<result<socket>>>(cb),
                    make_unique<typename impl_t::locals_t>(srv, endpoint))
       .run();
 }
 
-inline void accept(acceptor &srv, callback<ec_or<socket>> &&cb) noexcept {
-  async_syscall::accept(
+inline void accept(acceptor &srv, callback<result<socket>> &&cb) noexcept {
+  auto ret = async_syscall::accept(
       srv.context(), srv.get(), NULL, NULL, 0,
       [&ctx(srv.context()),
-       cb(forward<callback<ec_or<socket>>>(cb))](ec_or<long> ret) mutable {
+       cb(forward<callback<result<socket>>>(cb))](result<long> ret) mutable {
         if (!ret)
-          cb(ret.ec());
-        cb(wrap_accepted_socket(&ctx, static_cast<int>(ret.get())));
+          cb(ret.error());
+        cb(wrap_accepted_socket(&ctx, static_cast<int>(ret.value())));
       });
+  if (ret.has_error())
+    cb(ret.as_failure());
 }
 
 } // namespace async

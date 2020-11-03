@@ -2,7 +2,6 @@
 
 #include <ark/bindings.hpp>
 
-#include <ark/error/ec_or.hpp>
 #include <ark/io/fd.hpp>
 
 namespace ark {
@@ -11,7 +10,7 @@ protected:
   pipe_fd(int fd_int) : nonseekable_fd(fd_int) {}
 
 private:
-  static ec_or<pair<pipe_fd, pipe_fd>> __create(async_context *ctx) noexcept {
+  static result<pair<pipe_fd, pipe_fd>> __create(async_context *ctx) noexcept {
     int pipefd[2];
     int ret = clinux::pipe2(pipefd, 0);
     if (ret == -1) {
@@ -25,11 +24,11 @@ private:
   }
 
 public:
-  static ec_or<pair<pipe_fd, pipe_fd>> create() noexcept {
+  static result<pair<pipe_fd, pipe_fd>> create() noexcept {
     return __create(nullptr);
   }
 
-  static ec_or<pair<pipe_fd, pipe_fd>> create(async_context &ctx) noexcept {
+  static result<pair<pipe_fd, pipe_fd>> create(async_context &ctx) noexcept {
     return __create(&ctx);
   }
 };

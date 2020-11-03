@@ -6,7 +6,6 @@
 #include <ark/async/callback.hpp>
 #include <ark/async/io_uring/async_syscall.hpp>
 #include <ark/async/io_uring/context.hpp>
-#include <ark/error/ec_or.hpp>
 
 namespace ark {
 

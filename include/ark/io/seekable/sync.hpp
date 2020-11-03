@@ -5,7 +5,6 @@
 
 #include <ark/buffer/sequence.hpp>
 #include <ark/buffer/traits.hpp>
-#include <ark/error/ec_or.hpp>
 #include <ark/io/completion_condition.hpp>
 #include <ark/io/iovecs.hpp>
 #include <ark/io/seekable/seekable_fd.hpp>
@@ -15,8 +14,8 @@ namespace sync {
 
 template <class MutableBufferSequence,
           class CompletionCondition = transfer_all_t>
-inline ec_or<size_t> read(seekable_fd &f, const MutableBufferSequence &b,
-                          CompletionCondition cond = transfer_all()) {
+inline result<size_t> read(seekable_fd &f, const MutableBufferSequence &b,
+                           CompletionCondition cond = transfer_all()) {
   static_assert(is_mutable_buffer_sequence_v<MutableBufferSequence>);
 
   size_t done_sz = 0;
@@ -39,8 +38,8 @@ inline ec_or<size_t> read(seekable_fd &f, const MutableBufferSequence &b,
 }
 
 template <class ConstBufferSequence, class CompletionCondition = transfer_all_t>
-inline ec_or<size_t> write(seekable_fd &f, const ConstBufferSequence &b,
-                           CompletionCondition cond = transfer_all()) {
+inline result<size_t> write(seekable_fd &f, const ConstBufferSequence &b,
+                            CompletionCondition cond = transfer_all()) {
   static_assert(is_const_buffer_sequence_v<ConstBufferSequence>);
 
   size_t done_sz = 0;

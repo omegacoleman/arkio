@@ -33,9 +33,9 @@ public:
   }
 
   syscall_callback_t yield_syscall(
-      unique_function<void(async_op &op, syscall_callback_t::result_type ret)>
+      unique_function<void(async_op &op, syscall_callback_t::ret_type ret)>
           next) noexcept {
-    return yield<syscall_callback_t::result_type>(move(next));
+    return yield<syscall_callback_t::ret_type>(move(next));
   }
 
   void run() noexcept { Impl::run(*this); }

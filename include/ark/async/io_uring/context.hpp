@@ -4,16 +4,15 @@
 #include <ark/clinux.hpp>
 
 #include <ark/async/io_uring/io_uring.hpp>
-#include <ark/error/ec_or.hpp>
 
 namespace ark {
 namespace io_uring_async {
-using callback_t = unique_function<void(ec_or<long> result)>;
+using callback_t = unique_function<void(result<long> ret)>;
 
 class base_singlethread_uring_async_context {
 public:
   using token_t = uintptr_t;
-  using callback_t = unique_function<void(ec_or<long> result)>;
+  using callback_t = unique_function<void(result<long> ret)>;
 
 private:
   io_uring r_;
@@ -27,7 +26,6 @@ private:
   static const constexpr unsigned batch_size = 1024;
 
   int waker_evfd_;
-  volatile bool need_wake_;
 
   bool inited_;
   bool exiting_;
@@ -35,51 +33,43 @@ private:
 
   template <typename PrepSqeCallable // void prep_sqe(sqe_ref) noexcept
             >
-  ec_or<token_t> base_add_sqe(const PrepSqeCallable &prep_sqe) noexcept {
-    auto sqe_ret = r_.get_sqe();
-    if (!sqe_ret)
-      return sqe_ret.ec();
-    sqe_ref sqe = sqe_ret.get();
+  result<token_t> base_add_sqe(const PrepSqeCallable &prep_sqe) noexcept {
+    OUTCOME_TRY(sqe, r_.get_sqe());
     prep_sqe(sqe);
-    token_t ret = callbacks_idx_;
+    token_t tok = callbacks_idx_;
     sqe.set_data(reinterpret_cast<void *>(callbacks_idx_++));
 #ifdef ARK_ADVANCED_DEBUG_VERBOSITY
     sqe.dump();
 #endif
-    error_code ec = wake();
-    if (ec) {
-      cancel(ret);
-      return ec;
+    auto ret = wake();
+    if (ret.has_error()) {
+      cancel(tok);
+      return ret.as_failure();
     }
-    return ret;
+    return tok;
   }
 
-  error_code add_waker() noexcept {
+  result<void> add_waker() noexcept {
     auto ret =
         add_sqe([this](sqe_ref sqe) { sqe.prep_poll_add(waker_evfd_, POLLIN); },
-                [this](ec_or<long> ret) {
+                [this](result<long> ret) {
                   if (!ret) {
-                    this->exit_error(ret.ec());
+                    this->exit(ret.error());
                     return;
                   }
                   array<char, sizeof(uint64_t)> b;
                   auto read_ret = clinux::read(waker_evfd_, b.data(), b.size());
                   if (read_ret == -1) {
-                    this->exit_error(clinux::errno_ec());
+                    this->exit(clinux::errno_ec());
                     return;
                   }
-                  error_code ec = this->add_waker();
-                  if (ec)
-                    this->exit_error(ec);
+                  auto next_ret = this->add_waker();
+                  if (next_ret.has_error())
+                    this->exit(next_ret.error());
                 });
-    if (!ret)
-      return ret.ec();
-    return {};
-  }
-
-  void exit_error(error_code ec) noexcept {
-    exiting_error_ = ec;
-    exiting_ = true;
+    if (ret.has_error())
+      return ret.as_failure();
+    return success();
   }
 
   void submit() noexcept {
@@ -92,9 +82,9 @@ private:
 
 public:
   base_singlethread_uring_async_context() noexcept
-      : inited_(false), exiting_(false), callbacks_idx_(0), need_wake_(false) {}
+      : inited_(false), exiting_(false), callbacks_idx_(0) {}
 
-  error_code init() noexcept {
+  result<void> init() noexcept {
     Expects(!inited_);
 
     int waker_ret = clinux::eventfd(0, 0);
@@ -102,47 +92,54 @@ public:
       return clinux::errno_ec();
     waker_evfd_ = waker_ret;
 
-    error_code ec = r_.queue_init(batch_size, 0);
-    if (ec)
-      return ec;
+    auto ret = r_.queue_init(batch_size, 0);
+    if (ret.has_error())
+      return ret.as_failure();
 
     inited_ = true;
     return add_waker();
   }
 
-  error_code exit() noexcept {
+  void exit() noexcept {
     exiting_ = true;
-    return wake();
+    auto ret = wake();
+    if (ret.has_error()) {
+      cerr << "error occurred, waking up thread failed : "
+           << ret.error().message() << endl;
+      abort();
+    }
   }
 
-  error_code wake() noexcept {
-    if (!need_wake_)
-      return {};
+  void exit(result<void> ret) noexcept {
+    if (ret.has_error()) {
+      exiting_error_ = ret.error();
+    }
+    exit();
+  }
+
+  result<void> wake() noexcept {
     static uint64_t d{1};
     auto write_ret = clinux::write(waker_evfd_, &d, sizeof(d));
     if (write_ret == -1) {
       return clinux::errno_ec();
     }
-    return {};
+    return success();
   }
 
   template <typename PrepSqeCallable // void prep_sqe(sqe_ref) noexcept
             >
-  ec_or<token_t> add_sqe(const PrepSqeCallable &prep_sqe) noexcept {
+  result<token_t> add_sqe(const PrepSqeCallable &prep_sqe) noexcept {
     lock_guard<mutex> g_submission(m_submission_);
     return base_add_sqe(prep_sqe);
   }
 
   template <typename PrepSqeCallable // void prep_sqe(sqe_ref) noexcept
             >
-  ec_or<token_t> add_sqe(const PrepSqeCallable &prep_sqe,
-                         callback_t &&callback) noexcept {
+  result<token_t> add_sqe(const PrepSqeCallable &prep_sqe,
+                          callback_t &&callback) noexcept {
     lock_guard<mutex> g_submission(m_submission_);
     lock_guard<mutex> g_callbacks(m_callbacks_);
-    auto ret = base_add_sqe(prep_sqe);
-    if (!ret)
-      return ret.ec();
-    token_t tok = ret.get();
+    OUTCOME_TRY(tok, base_add_sqe(prep_sqe));
     callbacks_[tok] = forward<callback_t>(callback);
     return tok;
   }
@@ -152,7 +149,7 @@ public:
     callbacks_.erase(token);
   }
 
-  error_code run() noexcept {
+  result<void> run() noexcept {
     for (;;) {
       if (exiting_) {
         exiting_ = false;
@@ -161,22 +158,20 @@ public:
           exiting_error_ = {};
           return ret;
         } else {
-          return {};
+          return success();
         }
       }
       submit();
-      need_wake_ = true;
-      error_code ec = r_.wait();
-      need_wake_ = false;
-      if (ec)
-        return ec;
+      auto ret = r_.wait();
+      if (ret.has_error())
+        return ret.as_failure();
 #ifdef ARK_ADVANCED_DEBUG_VERBOSITY
       cerr << "### WOKE" << endl;
 #endif
 
       array<owning_cqe_ref, batch_size> cqe_buffer;
       auto cqe_end = r_.peek_batch_cqe(cqe_buffer.begin(), batch_size);
-      list<pair<callback_t, ec_or<long>>> run_callbacks;
+      list<pair<callback_t, result<long>>> run_callbacks;
       {
         lock_guard<mutex> g_callbacks(m_callbacks_);
         for (auto it = cqe_buffer.begin(); it != cqe_end; ++it) {
@@ -192,7 +187,7 @@ public:
             cerr << "### FOUND CALLBACK" << endl;
 #endif
             run_callbacks.emplace_back(forward<callback_t>(it_callback->second),
-                                       cqe.to_ec_or<long>());
+                                       cqe.to_result<long>());
             callbacks_.erase(it_callback);
           }
 
@@ -228,28 +223,30 @@ public:
   singlethread_uring_async_context() noexcept
       : base_(make_unique<base_singlethread_uring_async_context>()) {}
 
-  error_code init() noexcept { return base_->init(); }
+  result<void> init() noexcept { return base_->init(); }
 
-  error_code wake() noexcept { return base_->wake(); }
+  result<void> wake() noexcept { return base_->wake(); }
 
   template <typename PrepSqeCallable // void prep_sqe(sqe_ref) noexcept
             >
-  error_code add_sqe(const PrepSqeCallable &prep_sqe) noexcept {
+  result<void> add_sqe(const PrepSqeCallable &prep_sqe) noexcept {
     return base_->add_sqe(prep_sqe);
   }
 
   template <typename PrepSqeCallable // void prep_sqe(sqe_ref) noexcept
             >
-  ec_or<token_t> add_sqe(const PrepSqeCallable &prep_sqe,
-                         callback_t &&callback) noexcept {
+  result<token_t> add_sqe(const PrepSqeCallable &prep_sqe,
+                          callback_t &&callback) noexcept {
     return base_->add_sqe(prep_sqe, forward<callback_t>(callback));
   }
 
   void cancel(const token_t token) noexcept { base_->cancel(token); }
 
-  error_code run() noexcept { return base_->run(); }
+  result<void> run() noexcept { return base_->run(); }
 
-  error_code exit() noexcept { return base_->exit(); }
+  void exit() noexcept { return base_->exit(); }
+
+  void exit(result<void> ret) noexcept { return base_->exit(move(ret)); }
 };
 } // namespace io_uring_async
 } // namespace ark

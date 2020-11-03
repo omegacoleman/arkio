@@ -11,12 +11,15 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <outcome.hpp>
 #include <sstream>
 #include <string>
 #include <system_error>
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+namespace outcome = OUTCOME_V2_NAMESPACE;
 
 namespace ark {
 using byte = char;
@@ -26,6 +29,8 @@ using gsl::dynamic_extent;
 using gsl::not_null;
 using gsl::span;
 using gsl::strict_not_null;
+using outcome::result;
+using outcome::success;
 using std::abort;
 using std::add_const_t;
 using std::addressof;

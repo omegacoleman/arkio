@@ -65,25 +65,25 @@ const_buffer buffer(const const_buffer &b, size_t n) noexcept {
   return {b.data(), min(b.size(), n)};
 }
 
-#define ARK_BUFFER_CONSTRAIN_T                                                \
+#define ARK_BUFFER_CONSTRAIN_T                                                 \
   static_assert(is_trivially_copyable_v<T> || is_standard_layout_v<T>,         \
                 "T must be TriviallyCopyable or StandardLayout")
 
-#define ARK_BUFFER_IMPL_DATA                                                  \
+#define ARK_BUFFER_IMPL_DATA                                                   \
   return buffer(begin(data) != end(data) ? std::addressof(*begin(data))        \
                                          : nullptr,                            \
                 (end(data) - begin(data)) * sizeof(*begin(data)));
 
-#define ARK_BUFFER_IMPL_DATA_CONSTRAIN_T                                      \
-  ARK_BUFFER_CONSTRAIN_T;                                                     \
+#define ARK_BUFFER_IMPL_DATA_CONSTRAIN_T                                       \
+  ARK_BUFFER_CONSTRAIN_T;                                                      \
   return buffer(begin(data) != end(data) ? std::addressof(*begin(data))        \
                                          : nullptr,                            \
                 (end(data) - begin(data)) * sizeof(*begin(data)));
 
 #define ARK_BUFFER_IMPL_DATA_N return buffer(buffer(data), n);
 
-#define ARK_BUFFER_IMPL_DATA_N_CONSTRAIN_T                                    \
-  ARK_BUFFER_CONSTRAIN_T;                                                     \
+#define ARK_BUFFER_IMPL_DATA_N_CONSTRAIN_T                                     \
+  ARK_BUFFER_CONSTRAIN_T;                                                      \
   return buffer(buffer(data), n);
 
 template <class T, size_t N> mutable_buffer buffer(T (&data)[N]) noexcept {

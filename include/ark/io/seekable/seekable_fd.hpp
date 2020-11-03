@@ -15,11 +15,11 @@ private:
 
     base_type(int fd_int) noexcept : fd_(fd_int) {}
 
-    error_code close() noexcept {
+    result<void> close() noexcept {
       if (clinux::close(fd_) != 0) {
         return clinux::errno_ec();
       }
-      return {};
+      return success();
     }
 
     int get() const noexcept { return fd_; }
@@ -34,11 +34,11 @@ private:
 public:
   static constexpr bool seekable = true;
 
-  error_code close() noexcept {
+  result<void> close() noexcept {
     if (base_) {
       return base_->close();
     }
-    return {};
+    return success();
   }
 
   int get() const noexcept {

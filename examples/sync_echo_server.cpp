@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include <ark/buffer/buffer.hpp>
-#include <ark/error/ec_or.hpp>
 #include <ark/io/sync.hpp>
 #include <ark/net/address.hpp>
 #include <ark/net/tcp/acceptor.hpp>
@@ -12,45 +11,52 @@
 
 #define PRINT_ACCESS_LOG
 
-int main(void) {
-  using ark::buffer;
-  using ark::mutable_buffer;
-  using ark::panic_on_ec;
-  using ark::transfer_at_least;
-  namespace sync = ark::sync;
-  namespace net = ark::net;
-  namespace tcp = net::tcp;
+namespace program {
 
+using namespace ark;
+namespace tcp = net::tcp;
+
+result<void> run() {
   net::inet_address ep;
-  ep.host("127.0.0.1");
+  OUTCOME_TRY(ep.host("127.0.0.1"));
   ep.port(8080);
 
-  tcp::acceptor ac{panic_on_ec(tcp::acceptor::create())};
-  panic_on_ec(tcp::bind(ac, ep));
-  panic_on_ec(tcp::listen(ac));
+  OUTCOME_TRY(ac, tcp::acceptor::create());
+  OUTCOME_TRY(tcp::bind(ac, ep));
+  OUTCOME_TRY(tcp::listen(ac));
 
   for (;;) {
 #ifdef PRINT_ACCESS_LOG
     net::address addr;
-    tcp::socket s{panic_on_ec(tcp::sync::accept(ac, addr))};
-    std::cout << "accepted connection from "
-              << panic_on_ec(panic_on_ec(net::inet_address::from_address(addr))
-                                 .to_string())
-              << std::endl;
+    OUTCOME_TRY(s, tcp::sync::accept(ac, addr));
+    OUTCOME_TRY(in_addr, net::inet_address::from_address(addr));
+    OUTCOME_TRY(in_addr_s, to_string(in_addr));
+    std::cout << "accepted connection from " << in_addr_s << std::endl;
 #else
-    tcp::socket s{panic_on_ec(tcp::sync::accept(ac))};
+    OUTCOME_TRY(s, tcp::sync::accept(ac).value());
 #endif
     for (;;) {
       std::array<char, 1024> buf;
-      size_t sz = panic_on_ec(sync::read(s, buffer(buf), transfer_at_least(1)));
+      OUTCOME_TRY(sz, sync::read(s, buffer(buf), transfer_at_least(1)));
       if (sz == 0)
         break;
-      panic_on_ec(sync::write(s, buffer(buf, sz)));
+      OUTCOME_TRY(sync::write(s, buffer(buf, sz)));
     }
 #ifdef PRINT_ACCESS_LOG
     std::cout << "connection ended" << std::endl;
 #endif
   }
 
+  return success();
+}
+
+} // namespace program
+
+int main(void) {
+  auto ret = program::run();
+  if (ret.has_error()) {
+    std::cerr << "error : " << ret.error().message() << std::endl;
+    std::abort();
+  }
   return 0;
 }
