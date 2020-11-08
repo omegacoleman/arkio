@@ -1,6 +1,5 @@
 #include <functional>
 #include <iasr/buffer/buffer.hpp>
-#include <iasr/buffer/buffer_view.hpp>
 #include <iasr/coroutine/co_async.hpp>
 #include <iasr/coroutine/task.hpp>
 #include <iasr/error/ec_or.hpp>
@@ -15,11 +14,11 @@
 
 using iasr::async_context;
 using iasr::buffer;
-using iasr::buffer_view;
 using iasr::ec_or;
 using iasr::error_code;
 using iasr::panic_on_ec;
 using iasr::task;
+using iasr::transfer_at_least;
 namespace coro = iasr::coro;
 namespace net = iasr::net;
 namespace tcp = net::tcp;
@@ -28,9 +27,9 @@ void handle_conn_err(error_code ec) { std::cerr << ec.message() << std::endl; }
 
 task<void> handle_conn(tcp::socket s) {
   for (;;) {
-    buffer buf{1024};
+    std::array<char, 1024> buf;
 
-    auto ret = co_await coro::read_some(s, buf);
+    auto ret = co_await coro::read(s, buffer(buf), transfer_at_least(1));
     if (!ret)
       co_return handle_conn_err(ret.ec());
 
@@ -38,8 +37,7 @@ task<void> handle_conn(tcp::socket s) {
     if (sz == 0)
       break;
 
-    auto wr_ret =
-        co_await coro::write(s, buffer_view{buf.data(), buf.data() + sz});
+    auto wr_ret = co_await coro::write(s, buffer(buf, sz));
     if (!wr_ret)
       co_return handle_conn_err(wr_ret.ec());
   }

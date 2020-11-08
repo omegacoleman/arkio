@@ -1,5 +1,4 @@
 #include <iasr/buffer/buffer.hpp>
-#include <iasr/buffer/buffer_view.hpp>
 #include <iasr/coroutine/co_async.hpp>
 #include <iasr/coroutine/task.hpp>
 #include <iasr/error/ec_or.hpp>
@@ -9,25 +8,27 @@
 
 using iasr::async_context;
 using iasr::buffer;
-using iasr::buffer_view;
 using iasr::ec_or;
 using iasr::error_code;
+using iasr::mutable_buffer;
 using iasr::normal_file;
 using iasr::panic_on_ec;
 using iasr::task;
+using iasr::transfer_at_least;
 namespace coro = iasr::coro;
 
 task<error_code> to_stdout(normal_file &f) {
-  buffer buf{1024};
+  std::array<char, 1024> buf;
   for (;;) {
-    auto read_ret = co_await coro::read_some(f, buf);
+    auto read_ret = co_await coro::read(f, buffer(buf), transfer_at_least(1));
     if (!read_ret)
       co_return read_ret.ec();
     size_t sz = read_ret.get();
     if (sz == 0) {
       co_return error_code{};
     }
-    std::cout << std::string_view{buf.data(), sz};
+    std::cout.write(buf.data(), sz);
+    std::cout.flush();
   }
 }
 

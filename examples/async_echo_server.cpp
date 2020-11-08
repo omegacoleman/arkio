@@ -1,6 +1,5 @@
 #include <functional>
 #include <iasr/buffer/buffer.hpp>
-#include <iasr/buffer/buffer_view.hpp>
 #include <iasr/error/ec_or.hpp>
 #include <iasr/io/async.hpp>
 #include <iasr/net/address.hpp>
@@ -13,16 +12,16 @@
 
 using iasr::async_context;
 using iasr::buffer;
-using iasr::buffer_view;
 using iasr::ec_or;
 using iasr::panic_on_ec;
+using iasr::transfer_at_least;
 namespace async = iasr::async;
 namespace net = iasr::net;
 namespace tcp = net::tcp;
 
 struct echo_service : public std::enable_shared_from_this<echo_service> {
   tcp::socket s_;
-  buffer buf_{1024};
+  std::array<char, 1024> buf_;
 
 #ifdef PRINT_ACCESS_LOG
   net::address addr_;
@@ -48,9 +47,9 @@ struct echo_service : public std::enable_shared_from_this<echo_service> {
 #endif
 
   void do_echo() {
-    async::read_some(s_, buf_,
-                     std::bind(&echo_service::handle_read, shared_from_this(),
-                               std::placeholders::_1));
+    async::read(s_, buffer(buf_), transfer_at_least(1),
+                std::bind(&echo_service::handle_read, shared_from_this(),
+                          std::placeholders::_1));
   }
 
   void handle_write(ec_or<size_t> ret) {
@@ -69,7 +68,7 @@ struct echo_service : public std::enable_shared_from_this<echo_service> {
     size_t sz = ret.get();
     if (sz == 0)
       return;
-    async::write(s_, buffer_view{buf_.data(), buf_.data() + sz},
+    async::write(s_, buffer(buf_, sz),
                  std::bind(&echo_service::handle_write, shared_from_this(),
                            std::placeholders::_1));
   }

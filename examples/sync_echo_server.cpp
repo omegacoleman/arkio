@@ -1,5 +1,7 @@
+#include <array>
+#include <iostream>
+
 #include <iasr/buffer/buffer.hpp>
-#include <iasr/buffer/buffer_view.hpp>
 #include <iasr/error/ec_or.hpp>
 #include <iasr/io/sync.hpp>
 #include <iasr/net/address.hpp>
@@ -12,8 +14,9 @@
 
 int main(void) {
   using iasr::buffer;
-  using iasr::buffer_view;
+  using iasr::mutable_buffer;
   using iasr::panic_on_ec;
+  using iasr::transfer_at_least;
   namespace sync = iasr::sync;
   namespace net = iasr::net;
   namespace tcp = net::tcp;
@@ -38,11 +41,11 @@ int main(void) {
     tcp::socket s{panic_on_ec(tcp::sync::accept(ac))};
 #endif
     for (;;) {
-      buffer buf{1024};
-      size_t sz = panic_on_ec(sync::read_some(s, buf));
+      std::array<char, 1024> buf;
+      size_t sz = panic_on_ec(sync::read(s, buffer(buf), transfer_at_least(1)));
       if (sz == 0)
         break;
-      panic_on_ec(sync::write(s, buffer_view{buf.data(), buf.data() + sz}));
+      panic_on_ec(sync::write(s, buffer(buf, sz)));
     }
 #ifdef PRINT_ACCESS_LOG
     std::cout << "connection ended" << std::endl;

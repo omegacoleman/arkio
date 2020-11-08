@@ -1,5 +1,4 @@
 #include <iasr/buffer/buffer.hpp>
-#include <iasr/buffer/buffer_view.hpp>
 #include <iasr/coroutine/co_async.hpp>
 #include <iasr/coroutine/task.hpp>
 #include <iasr/error/ec_or.hpp>
@@ -11,10 +10,11 @@ using iasr::async_context;
 using iasr::error_code;
 using iasr::panic_on_ec;
 using iasr::task;
+using iasr::transfer_at_least;
 
 task<void> do_tcp_client(async_context &ctx) {
   using iasr::buffer;
-  using iasr::buffer_view;
+  using iasr::mutable_buffer;
   namespace coro = iasr::coro;
   namespace net = iasr::net;
 
@@ -27,11 +27,12 @@ task<void> do_tcp_client(async_context &ctx) {
 
   const std::string wr_buf{
       "GET /index.html HTTP/1.1\r\nHost: isocpp.org\r\n\r\n"};
-  panic_on_ec(co_await coro::write(s, wr_buf));
+  panic_on_ec(co_await coro::write(s, buffer(wr_buf)));
 
   for (;;) {
-    buffer rd_buf{1024};
-    size_t sz = panic_on_ec(co_await coro::read_some(s, rd_buf));
+    std::array<char, 1024> rd_buf;
+    size_t sz = panic_on_ec(
+        co_await coro::read(s, buffer(rd_buf), transfer_at_least(1)));
     std::cout.write(rd_buf.data(), sz);
   }
 

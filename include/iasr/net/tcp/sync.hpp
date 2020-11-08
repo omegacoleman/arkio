@@ -28,15 +28,12 @@ inline ec_or<socket> accept(acceptor &srv) noexcept {
 }
 
 inline ec_or<socket> accept(acceptor &srv, address &endpoint) noexcept {
-  buffer addr_buf{sizeof(clinux::sockaddr)};
-  clinux::socklen_t addrlen_buf = addr_buf.size();
-  int ret = clinux::accept4(
-      srv.get(), reinterpret_cast<clinux::sockaddr *>(addr_buf.data()),
-      addressof(addrlen_buf), 0);
+  clinux::socklen_t addrlen_buf = endpoint.sa_len();
+  int ret =
+      clinux::accept4(srv.get(), endpoint.sa_ptr(), addressof(addrlen_buf), 0);
   if (ret == -1) {
     return clinux::errno_ec();
   }
-  endpoint = address(buffer(addr_buf.begin(), addr_buf.begin() + addrlen_buf));
   return wrap_accepted_socket(nullptr, ret);
 }
 

@@ -15,10 +15,10 @@ namespace coro {
 struct read_some_buffer_awaitable : public awaitable_op<ec_or<size_t>> {
   async_context &ctx_;
   fd &f_;
-  const buffer_view b_;
+  const mutable_buffer b_;
 
   read_some_buffer_awaitable(async_context &ctx, fd &f,
-                             const buffer_view b) noexcept
+                             const mutable_buffer b) noexcept
       : ctx_(ctx), f_(f), b_(b) {}
   void invoke(callback<ec_or<size_t>> &&cb) noexcept override {
     async::read_some(ctx_, f_, b_, forward<callback<ec_or<size_t>>>(cb));
@@ -28,10 +28,10 @@ struct read_some_buffer_awaitable : public awaitable_op<ec_or<size_t>> {
 struct write_some_buffer_awaitable : public awaitable_op<ec_or<size_t>> {
   async_context &ctx_;
   fd &f_;
-  const const_buffer_view b_;
+  const const_buffer b_;
 
   write_some_buffer_awaitable(async_context &ctx, fd &f,
-                              const const_buffer_view b) noexcept
+                              const const_buffer b) noexcept
       : ctx_(ctx), f_(f), b_(b) {}
   void invoke(callback<ec_or<size_t>> &&cb) noexcept override {
     async::write_some(ctx_, f_, b_, forward<callback<ec_or<size_t>>>(cb));
@@ -41,9 +41,10 @@ struct write_some_buffer_awaitable : public awaitable_op<ec_or<size_t>> {
 struct read_buffer_awaitable : public awaitable_op<ec_or<size_t>> {
   async_context &ctx_;
   fd &f_;
-  const buffer_view b_;
+  const mutable_buffer b_;
 
-  read_buffer_awaitable(async_context &ctx, fd &f, const buffer_view b) noexcept
+  read_buffer_awaitable(async_context &ctx, fd &f,
+                        const mutable_buffer b) noexcept
       : ctx_(ctx), f_(f), b_(b) {}
   void invoke(callback<ec_or<size_t>> &&cb) noexcept override {
     async::read(ctx_, f_, b_, forward<callback<ec_or<size_t>>>(cb));
@@ -53,10 +54,10 @@ struct read_buffer_awaitable : public awaitable_op<ec_or<size_t>> {
 struct write_buffer_awaitable : public awaitable_op<ec_or<size_t>> {
   async_context &ctx_;
   fd &f_;
-  const const_buffer_view b_;
+  const const_buffer b_;
 
   write_buffer_awaitable(async_context &ctx, fd &f,
-                         const const_buffer_view b) noexcept
+                         const const_buffer b) noexcept
       : ctx_(ctx), f_(f), b_(b) {}
   void invoke(callback<ec_or<size_t>> &&cb) noexcept override {
     async::write(ctx_, f_, b_, forward<callback<ec_or<size_t>>>(cb));
@@ -119,12 +120,13 @@ struct write_bseq_awaitable : public awaitable_op<ec_or<size_t>> {
   }
 };
 
-inline auto read_some(async_context &ctx, fd &f, const buffer_view b) noexcept {
+inline auto read_some(async_context &ctx, fd &f,
+                      const mutable_buffer b) noexcept {
   return read_some_buffer_awaitable(ctx, f, b);
 }
 
 inline auto write_some(async_context &ctx, fd &f,
-                       const const_buffer_view b) noexcept {
+                       const const_buffer b) noexcept {
   return write_some_buffer_awaitable(ctx, f, b);
 }
 
@@ -139,12 +141,11 @@ inline auto write_some(async_context &ctx, fd &f, ConstBufferSeq &b) noexcept {
   return write_some_bseq_awaitable(ctx, f, b);
 }
 
-inline auto read(async_context &ctx, fd &f, const buffer_view b) noexcept {
+inline auto read(async_context &ctx, fd &f, const mutable_buffer b) noexcept {
   return read_buffer_awaitable(ctx, f, b);
 }
 
-inline auto write(async_context &ctx, fd &f,
-                  const const_buffer_view b) noexcept {
+inline auto write(async_context &ctx, fd &f, const const_buffer b) noexcept {
   return write_buffer_awaitable(ctx, f, b);
 }
 

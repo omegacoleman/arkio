@@ -30,7 +30,6 @@ struct accept_with_address_impl {
     acceptor &f_;
     address &endpoint_;
 
-    buffer addr_buf{sizeof(clinux::sockaddr)};
     clinux::socklen_t addrlen_buf{sizeof(clinux::sockaddr)};
 
     locals_t(acceptor &f, address &endpoint) : f_(f), endpoint_(endpoint) {}
@@ -39,20 +38,16 @@ struct accept_with_address_impl {
   using op_t = async_op<accept_with_address_impl>;
 
   static void run(op_t &op) noexcept {
-    async_syscall::accept(
-        op.ctx_, op.locals_->f_.get(),
-        reinterpret_cast<clinux::sockaddr *>(op.locals_->addr_buf.data()),
-        addressof(op.locals_->addrlen_buf), 0,
-        op.yield_syscall(accept_with_address_impl::finish));
+    async_syscall::accept(op.ctx_, op.locals_->f_.get(),
+                          op.locals_->endpoint_.sa_ptr(),
+                          addressof(op.locals_->addrlen_buf), 0,
+                          op.yield_syscall(accept_with_address_impl::finish));
   }
 
   static void finish(op_t &op, ec_or<long> ret) noexcept {
     if (!ret) {
       op.complete(ret.ec());
     }
-    op.locals_->endpoint_ =
-        address(buffer(op.locals_->addr_buf.begin(),
-                       op.locals_->addr_buf.begin() + op.locals_->addrlen_buf));
     op.complete(wrap_accepted_socket(&op.ctx_, static_cast<int>(ret.get())));
   }
 };

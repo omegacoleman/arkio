@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iasr/buffer/buffer.hpp>
-#include <iasr/buffer/buffer_view.hpp>
+#include <iasr/buffer/mutable_buffer.hpp>
 #include <iasr/buffer/traits.hpp>
 
 using namespace iasr;
@@ -50,26 +50,26 @@ TEST(buffer, copying) {
   ASSERT_NE(buf_orig.data(), buf_copied.data());
 }
 
-TEST(buffer_view, from_buffer_ctor) {
+TEST(mutable_buffer, from_buffer_ctor) {
   buffer buf_orig{1024, 0x33};
-  buffer_view bv{buf_orig};
+  mutable_buffer bv{buf_orig};
   for (int i = 0; i < 1024; i++) {
     ASSERT_EQ(bv.data()[i], 0x33);
   }
   ASSERT_EQ(bv.size(), 1024);
 }
 
-TEST(buffer_view, from_span_ctor) {
+TEST(mutable_buffer, from_span_ctor) {
   unsigned long longs[5];
   span<unsigned long> sp{longs};
-  buffer_view bv{sp};
+  mutable_buffer bv{sp};
   ASSERT_EQ(bv.size(), 5 * sizeof(unsigned long));
 }
 
 TEST(traits, buffer_is_buffer_like) { ASSERT_TRUE(is_buffer_like_v<buffer>); }
 
-TEST(traits, buffer_view_is_buffer_like) {
-  ASSERT_TRUE(is_buffer_like_v<buffer_view>);
+TEST(traits, mutable_buffer_is_buffer_like) {
+  ASSERT_TRUE(is_buffer_like_v<mutable_buffer>);
 }
 
 TEST(traits, span_byte_is_buffer_like) {
@@ -86,12 +86,12 @@ TEST(traits, vector_of_buffer_is_buffer_seq) {
   ASSERT_TRUE(is_buffer_seq_v<vector<buffer>>);
 }
 
-TEST(traits, vector_of_buffer_view_is_buffer_seq) {
-  ASSERT_TRUE(is_buffer_seq_v<vector<buffer_view>>);
+TEST(traits, vector_of_mutable_buffer_is_buffer_seq) {
+  ASSERT_TRUE(is_buffer_seq_v<vector<mutable_buffer>>);
 }
 
-TEST(traits, span_of_buffer_view_is_buffer_seq) {
-  ASSERT_TRUE(is_buffer_seq_v<span<buffer_view>>);
+TEST(traits, span_of_mutable_buffer_is_buffer_seq) {
+  ASSERT_TRUE(is_buffer_seq_v<span<mutable_buffer>>);
 }
 
 TEST(traits, vector_of_string_is_buffer_seq) {
@@ -106,6 +106,6 @@ TEST(traits, buffer_is_not_buffer_seq) {
   ASSERT_FALSE(is_buffer_seq_v<buffer>);
 }
 
-TEST(traits, buffer_view_is_not_buffer_seq) {
-  ASSERT_FALSE(is_buffer_seq_v<buffer_view>);
+TEST(traits, mutable_buffer_is_not_buffer_seq) {
+  ASSERT_FALSE(is_buffer_seq_v<mutable_buffer>);
 }
