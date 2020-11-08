@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 
-#include <iasr/error/ec_or.hpp>
+#include <ark/error/ec_or.hpp>
 
-using namespace iasr;
+using namespace ark;
 
 ec_or<int> divide_by(int lhs, int rhs) {
   if (rhs == 0) {

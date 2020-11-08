@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(uh2)
+project(arkio)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 

@@ -3,18 +3,18 @@
 
 #include "gtest/gtest.h"
 
-#include <iasr/error/ec_or.hpp>
+#include <ark/error/ec_or.hpp>
 
-#include <iasr/general/event_fd.hpp>
-#include <iasr/general/mem_fd.hpp>
-#include <iasr/general/pipe_fd.hpp>
+#include <ark/general/event_fd.hpp>
+#include <ark/general/mem_fd.hpp>
+#include <ark/general/pipe_fd.hpp>
 
-#include <iasr/io/sync.hpp>
+#include <ark/io/sync.hpp>
 
 TEST(general, event_fd) {
-  using iasr::buffer;
-  using iasr::event_fd;
-  namespace sync = iasr::sync;
+  using ark::buffer;
+  using ark::event_fd;
+  namespace sync = ark::sync;
 
   uint64_t data[1] = {1};
   auto fd = panic_on_ec(event_fd::create(0, 0));
@@ -24,9 +24,9 @@ TEST(general, event_fd) {
 }
 
 TEST(general, mem_fd) {
-  using iasr::buffer;
-  using iasr::mem_fd;
-  namespace sync = iasr::sync;
+  using ark::buffer;
+  using ark::mem_fd;
+  namespace sync = ark::sync;
 
   std::string data = "hello";
   auto fd = panic_on_ec(mem_fd::create("test_mfd", 0));
@@ -39,9 +39,9 @@ TEST(general, mem_fd) {
 }
 
 TEST(general, pipe_fd) {
-  using iasr::buffer;
-  using iasr::pipe_fd;
-  namespace sync = iasr::sync;
+  using ark::buffer;
+  using ark::pipe_fd;
+  namespace sync = ark::sync;
 
   std::string data = "hello";
   auto ends = panic_on_ec(pipe_fd::create());

@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 
-#include <iasr/net/address.hpp>
+#include <ark/net/address.hpp>
 
-using namespace iasr;
+using namespace ark;
 
 TEST(net_address, ipv4) {
   net::inet_address addr;
