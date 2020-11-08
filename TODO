@@ -2,7 +2,9 @@
 - [x] split seekable and unseekable fd
 - [x] bind fd to async contexts
 - [ ] better tests
-- [ ] pipefd & timerfd
+- [ ] ec_or to ned14/outcome
+- [x] pipefd
+- [ ] timerfd
 - [ ] streambuf migration
 - [ ] multithreading
 
