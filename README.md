@@ -14,6 +14,16 @@ The _proactor_ design pattern demultiplexes and dispatches events asynchronously
 ## coroutine echo server
 
 ``` c++
+#include <array>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <ark.hpp>
+
+// #define PRINT_ACCESS_LOG
+
 namespace program {
 
 using namespace ark;

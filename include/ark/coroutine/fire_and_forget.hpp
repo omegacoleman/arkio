@@ -3,8 +3,6 @@
 #include <ark/bindings.hpp>
 #include <ark/coro_bindings.hpp>
 
-#include <ark/misc/manual_lifetime.hpp>
-
 namespace ark {
 
 class fire_and_forget {

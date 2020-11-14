@@ -1,14 +1,10 @@
-#include <ark/buffer/buffer.hpp>
-#include <ark/coroutine/co_async.hpp>
-#include <ark/coroutine/task.hpp>
-#include <ark/io/coro.hpp>
-#include <ark/misc/context_exit_guard.hpp>
-#include <ark/net/address.hpp>
-#include <ark/net/tcp/acceptor.hpp>
-#include <ark/net/tcp/coro.hpp>
-#include <ark/net/tcp/general.hpp>
-#include <ark/net/tcp/socket.hpp>
-#include <functional>
+#include <array>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <ark.hpp>
 
 // #define PRINT_ACCESS_LOG
 

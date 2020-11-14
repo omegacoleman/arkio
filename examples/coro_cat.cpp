@@ -1,10 +1,10 @@
-#include <ark/buffer/buffer.hpp>
-#include <ark/coroutine/co_async.hpp>
-#include <ark/coroutine/task.hpp>
-#include <ark/general/normal_file.hpp>
-#include <ark/io/coro.hpp>
-#include <ark/misc/context_exit_guard.hpp>
+#include <array>
 #include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <ark.hpp>
 
 namespace program {
 

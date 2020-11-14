@@ -13,6 +13,8 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
             message(WARNING "gcc support for coroutines is untested, and libstdc++ lacks coroutine support")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
         endif()
+    else()
+        add_definitions(-DARK_NO_COROUTINES)
     endif()
 endif()
 

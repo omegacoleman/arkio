@@ -1,10 +1,9 @@
 #include <array>
 #include <iostream>
+#include <string>
+#include <utility>
 
-#include <ark/buffer/buffer.hpp>
-#include <ark/io/sync.hpp>
-#include <ark/net/address.hpp>
-#include <ark/net/tcp/sync.hpp>
+#include <ark.hpp>
 
 namespace program {
 

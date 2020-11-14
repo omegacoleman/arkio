@@ -1,9 +1,10 @@
 #include <array>
 #include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <ark/buffer/buffer.hpp>
-#include <ark/general/normal_file.hpp>
-#include <ark/io/sync.hpp>
+#include <ark.hpp>
 
 namespace program {
 

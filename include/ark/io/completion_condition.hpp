@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ark/bindings.hpp>
+
 namespace ark {
 
 struct transfer_all_t {

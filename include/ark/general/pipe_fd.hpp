@@ -2,7 +2,8 @@
 
 #include <ark/bindings.hpp>
 
-#include <ark/io/fd.hpp>
+#include <ark/async.hpp>
+#include <ark/io.hpp>
 
 namespace ark {
 class pipe_fd : public nonseekable_fd {

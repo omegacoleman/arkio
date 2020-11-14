@@ -1,11 +1,8 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
-#include <ark/coro_bindings.hpp>
-
-#include <ark/coroutine/awaitable_op.hpp>
+#include <ark/coroutine.hpp>
 #include <ark/io/async.hpp>
 #include <ark/io/completion_condition.hpp>
 

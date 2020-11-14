@@ -3,7 +3,7 @@
 #include <ark/bindings.hpp>
 #include <ark/coro_bindings.hpp>
 
-#include <ark/async/callback.hpp>
+#include <ark/async.hpp>
 
 namespace ark {
 

@@ -1,13 +1,10 @@
 #include <array>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
 
-#include <ark/buffer/buffer.hpp>
-#include <ark/io/sync.hpp>
-#include <ark/net/address.hpp>
-#include <ark/net/tcp/acceptor.hpp>
-#include <ark/net/tcp/general.hpp>
-#include <ark/net/tcp/socket.hpp>
-#include <ark/net/tcp/sync.hpp>
+#include <ark.hpp>
 
 #define PRINT_ACCESS_LOG
 
