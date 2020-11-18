@@ -1,7 +1,9 @@
 #pragma once
 
-#include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
+/*! \cond FILE_NOT_DOCUMENTED */
+
+#include <ark/bindings/bindings.hpp>
+#include <ark/bindings/clinux.hpp>
 
 namespace ark {
 namespace detail {
@@ -15,3 +17,5 @@ static const inline ign_pipe __ign_pipe{};
 #endif
 } // namespace detail
 } // namespace ark
+
+/*! \endcond */

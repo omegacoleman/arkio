@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 #include <ark/buffer.hpp>
 #include <ark/io/completion_condition.hpp>
@@ -9,12 +8,21 @@
 #include <ark/io/nonseekable/nonseekable_fd.hpp>
 
 namespace ark {
+
+/*! \addtogroup io
+ *  @{
+ */
+
 namespace sync {
 
-template <class MutableBufferSequence,
-          class CompletionCondition = transfer_all_t>
+/*!
+ * \brief read from fd to buffer until eof or completion condition is met.
+ *
+ * blocks until complete or error.
+ */
+template <class MutableBufferSequence, class CompletionCondition>
 inline result<size_t> read(nonseekable_fd &f, const MutableBufferSequence &b,
-                           CompletionCondition cond = transfer_all()) {
+                           CompletionCondition cond) {
   static_assert(is_mutable_buffer_sequence_v<MutableBufferSequence>);
 
   size_t done_sz = 0;
@@ -34,7 +42,22 @@ inline result<size_t> read(nonseekable_fd &f, const MutableBufferSequence &b,
   return done_sz;
 }
 
-template <class ConstBufferSequence, class CompletionCondition = transfer_all_t>
+/*!
+ * \brief read from fd to buffer until eof or completion condition is met.
+ *
+ * blocks until complete or error, same as read(f, b, transfer_all()).
+ */
+template <class MutableBufferSequence>
+inline result<size_t> read(nonseekable_fd &f, const MutableBufferSequence &b) {
+  return read(f, b, transfer_all());
+}
+
+/*!
+ * \brief write to fd from buffer until completion condition is met.
+ *
+ * blocks until complete or error.
+ */
+template <class ConstBufferSequence, class CompletionCondition>
 inline result<size_t> write(nonseekable_fd &f, const ConstBufferSequence &b,
                             CompletionCondition cond = transfer_all()) {
   static_assert(is_const_buffer_sequence_v<ConstBufferSequence>);
@@ -54,5 +77,18 @@ inline result<size_t> write(nonseekable_fd &f, const ConstBufferSequence &b,
   return done_sz;
 }
 
+/*!
+ * \brief write to fd from buffer until completion condition is met.
+ *
+ * blocks until complete or error, same as write(f, b, transfer_all()).
+ */
+template <class ConstBufferSequence>
+inline result<size_t> write(nonseekable_fd &f, const ConstBufferSequence &b) {
+  return write(f, b, transfer_all());
+}
+
 } // namespace sync
+
+/*! @} */
+
 } // namespace ark

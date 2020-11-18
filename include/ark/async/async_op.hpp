@@ -1,7 +1,8 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 #include <ark/async/context.hpp>
 
@@ -52,3 +53,5 @@ public:
 };
 
 } // namespace ark
+
+/*! \endcond */

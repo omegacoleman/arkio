@@ -1,19 +1,36 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/coro_bindings.hpp>
 
 #include <ark/misc/manual_lifetime.hpp>
 
 namespace ark {
 
+/*! \addtogroup coroutine
+ *  @{
+ */
+
+/*!
+ * \brief task<> as defined in p1056, without exception support
+ *
+ * This class could be used as return value in coroutines, so that the coroutine
+ * could co_await the awaited functions provided in coro::, and return a value T
+ * to the caller
+ *
+ * Exceptions not supported as this library uses outcome. Use task<result<T>>
+ * and CoTry for error handling
+ *
+ * \remark as defined in p1056r0, see \ref info_coro
+ */
 template <class T> class task;
+
+#ifndef USING_DOXYGEN
 
 template <class T> class task_promise {
 public:
   task_promise() noexcept {}
 
-  ~task_promise() { clear(); }
+  ~task_promise() noexcept { clear(); }
 
   task<T> get_return_object() noexcept;
 
@@ -66,7 +83,7 @@ template <> class task_promise<void> {
 public:
   task_promise() noexcept {}
 
-  ~task_promise() { clear(); }
+  ~task_promise() noexcept { clear(); }
 
   task<void> get_return_object() noexcept;
 
@@ -74,11 +91,11 @@ public:
 
   auto final_suspend() noexcept {
     struct awaiter {
-      bool await_ready() { return false; }
-      auto await_suspend(coroutine_handle<task_promise> h) {
+      bool await_ready() noexcept { return false; }
+      auto await_suspend(coroutine_handle<task_promise> h) noexcept {
         return h.promise().continuation_;
       }
-      void await_resume() {}
+      void await_resume() noexcept {}
     };
     return awaiter{};
   }
@@ -124,7 +141,7 @@ public:
 
   task(task &&t) noexcept : coro_(exchange(t.coro_, {})) {}
 
-  ~task() {
+  ~task() noexcept {
     if (coro_) {
       coro_.destroy();
     }
@@ -133,13 +150,13 @@ public:
   auto operator co_await() &&noexcept {
     struct awaiter {
     public:
-      explicit awaiter(handle_t coro) : coro_(coro) {}
+      explicit awaiter(handle_t coro) noexcept : coro_(coro) {}
       bool await_ready() noexcept { return false; }
       auto await_suspend(coroutine_handle<void> h) noexcept {
         coro_.promise().continuation_ = h;
         return coro_;
       }
-      T await_resume() { return coro_.promise().get(); }
+      T await_resume() noexcept { return coro_.promise().get(); }
 
     private:
       handle_t coro_;
@@ -158,5 +175,9 @@ template <class T> task<T> task_promise<T>::get_return_object() noexcept {
 inline task<void> task_promise<void>::get_return_object() noexcept {
   return task<void>(coroutine_handle<task_promise<void>>::from_promise(*this));
 }
+
+#endif
+
+/*! @} */
 
 } // namespace ark

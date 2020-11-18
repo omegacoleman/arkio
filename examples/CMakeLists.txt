@@ -1,8 +1,8 @@
 set(EXAMPLE_SRCS
-    sync_cat.cpp;sync_tcp_client.cpp;sync_echo_server.cpp;async_echo_server.cpp;async_tcp_client.cpp)
+    sync_cat.cpp;sync_echo_server.cpp;async_echo_server.cpp)
 
 if(${WITH_COROUTINES})
-	list(APPEND EXAMPLE_SRCS coro_cat.cpp;coro_tcp_client.cpp;coro_echo_server.cpp)
+	list(APPEND EXAMPLE_SRCS coro_cat.cpp;coro_echo_server.cpp)
 endif()
 
 foreach(example_src IN ITEMS ${EXAMPLE_SRCS})

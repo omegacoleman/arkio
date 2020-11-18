@@ -1,5 +1,14 @@
 #pragma once
 
+namespace ark {
+namespace net {
+/*!
+ * \brief implements TCP/TP related classes and functions
+ */
+namespace tcp {}
+} // namespace net
+} // namespace ark
+
 #include <ark/net/tcp/acceptor.hpp>
 #include <ark/net/tcp/socket.hpp>
 

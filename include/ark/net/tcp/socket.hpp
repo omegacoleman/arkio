@@ -1,20 +1,40 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 #include <ark/io/fd.hpp>
 
 namespace ark {
 namespace net {
+
+/*! \addtogroup net
+ *  @{
+ */
+
 namespace tcp {
+
+/*! \cond SOCKET_WRAP_INTERNALS */
 
 class socket;
 
 inline socket wrap_accepted_socket(async_context *ctx, int fd) noexcept;
 
+/*! \endcond */
+
+/*!
+ * \brief denotes a tcp socket
+ *
+ * will be availble for io after a successful connect operation, sync or async,
+ * or if the socket is retrieved by accepting from an \ref
+ * ::ark::net::tcp::acceptor
+ */
 class socket : public nonseekable_fd {
 protected:
+  /*!
+   * \brief constructs from int fildes
+   *
+   * \param[in] fd_int must be an fildes opened by socket(2)
+   */
   socket(int fd_int) : nonseekable_fd(fd_int) {}
 
 private:
@@ -30,18 +50,35 @@ private:
   }
 
 public:
+  /*! \cond SOCKET_WRAP_INTERNALS */
   friend inline socket wrap_accepted_socket(async_context *ctx,
                                             int fd) noexcept;
+  /*! \endcond */
 
+  /*!
+   * \brief constructs a socket availble for connecting
+   *
+   * \param[in] use_ipv6 if set to true, associated connect should use \ref
+   * ark::net::inet6_address
+   */
   static result<socket> create(bool use_ipv6 = false) noexcept {
     return __create(nullptr, use_ipv6);
   }
 
+  /*!
+   * \brief constructs a socket availble for connecting
+   *
+   * \param[in] ctx bound to this \ref ark::async_context in addition, notice
+   * that it would also be bound for accepted sockets \param[in] use_ipv6 if set
+   * to true, associated connect should use \ref ark::net::inet6_address
+   */
   static result<socket> create(async_context &ctx,
                                bool use_ipv6 = false) noexcept {
     return __create(&ctx, use_ipv6);
   }
 };
+
+/*! \cond SOCKET_WRAP_INTERNALS */
 
 inline socket wrap_accepted_socket(async_context *ctx, int fd) noexcept {
   socket ret(fd);
@@ -49,6 +86,10 @@ inline socket wrap_accepted_socket(async_context *ctx, int fd) noexcept {
   return move(ret);
 }
 
+/*! \endcond */
 } // namespace tcp
+
+/*! @} */
+
 } // namespace net
 } // namespace ark

@@ -6,40 +6,70 @@
 
 namespace ark {
 
-// N4771 [buffer.seq.access]
+/*! \addtogroup buffer
+ *  @{
+ */
 
-const mutable_buffer *buffer_sequence_begin(const mutable_buffer &b) noexcept {
+/*!
+ * \brief returns an iterator to the first buffer of ConstBufferSequence
+ *
+ * returns std::addressof(b) for buffers, and c.begin() for iterables of buffers
+ *
+ * \remark [buffer.seq.access] as defined in N4771, see \ref info_network
+ */
+inline const mutable_buffer *
+buffer_sequence_begin(const mutable_buffer &b) noexcept {
   return addressof(b);
 }
 
-const mutable_buffer *buffer_sequence_end(const mutable_buffer &b) noexcept {
-  return addressof(b) + 1;
-}
-
-const const_buffer *buffer_sequence_begin(const const_buffer &b) noexcept {
+/*! \copydoc buffer_sequence_begin(const mutable_buffer &) */
+inline const const_buffer *
+buffer_sequence_begin(const const_buffer &b) noexcept {
   return addressof(b);
 }
 
-const const_buffer *buffer_sequence_end(const const_buffer &b) noexcept {
-  return addressof(b) + 1;
-}
-
+/*! \copydoc buffer_sequence_begin(const mutable_buffer &) */
 template <class C> auto buffer_sequence_begin(C &c) noexcept {
   return c.begin();
 }
 
+/*! \copydoc buffer_sequence_begin(const mutable_buffer &) */
 template <class C> auto buffer_sequence_begin(const C &c) noexcept {
   return c.begin();
 }
 
+/*!
+ * \brief returns an iterator past the last buffer of BufferSequence
+ *
+ * returns std::addressof(b)+1 for buffers, and c.end() for iterables of buffers
+ *
+ * \remark [buffer.seq.access] as defined in N4771, see \ref info_network
+ */
+inline const mutable_buffer *
+buffer_sequence_end(const mutable_buffer &b) noexcept {
+  return addressof(b) + 1;
+}
+
+/*! \copydoc buffer_sequence_end(const mutable_buffer &) */
+inline const const_buffer *buffer_sequence_end(const const_buffer &b) noexcept {
+  return addressof(b) + 1;
+}
+
+/*! \copydoc buffer_sequence_end(const mutable_buffer &) */
 template <class C> auto buffer_sequence_end(C &c) noexcept { return c.end(); }
 
+/*! \copydoc buffer_sequence_end(const mutable_buffer &) */
 template <class C> auto buffer_sequence_end(const C &c) noexcept {
   return c.end();
 }
 
-// N4771 [buffer.size]
-
+/*!
+ * \brief returns the sum size of a ConstBufferSequence
+ *
+ * time complexity O(sizeof(buffers))
+ *
+ * \remark [buffer.size] as defined in N4771, see \ref info_network
+ */
 template <class ConstBufferSequence>
 size_t buffer_size(const ConstBufferSequence &buffers) noexcept {
   size_t total_size = 0;
@@ -52,8 +82,16 @@ size_t buffer_size(const ConstBufferSequence &buffers) noexcept {
   return total_size;
 }
 
-// N4771 [buffer.copy]
-
+/*!
+ * \brief copy the underlying bytes from one buffer to another
+ *
+ * \param[in] max_size the maxium bytes allowed to copy
+ *
+ * \pre no overlaps allowed between source and dest, otherwise the behavior is
+ * undefined
+ *
+ * \remark [buffer.copy] as defined in N4771, see \ref info_network
+ */
 template <class MutableBufferSequence, class ConstBufferSequence>
 size_t buffer_copy(const MutableBufferSequence &dest,
                    const ConstBufferSequence &source, size_t max_size) {
@@ -91,5 +129,7 @@ size_t buffer_copy(const MutableBufferSequence &dest,
     }
   }
 }
+
+/*! @} */
 
 }; // namespace ark

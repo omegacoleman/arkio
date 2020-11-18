@@ -1,6 +1,19 @@
 #pragma once
 
-#include <ark/bindings.hpp>
+/*!
+ * \brief contains symbols normally placed in linux-headers
+ *
+ * arkio demands a few symbols from linux-headers, which is the c header files
+ * for linux kernel. Functions and structs are aliased by keyword 'using', while
+ * macros remain in the global.
+ *
+ * This approach is to avoid naming conflicts.
+ */
+namespace clinux {}
+
+/*! \cond FILE_NOT_DOCUMENTED */
+
+#include <ark/bindings/bindings.hpp>
 
 extern "C" {
 #include <arpa/inet.h>
@@ -68,3 +81,5 @@ inline const constexpr version_t version(const int major, const int minor,
 
 } // namespace clinux
 } // namespace ark
+
+/*! \endcond */

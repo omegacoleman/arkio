@@ -1,7 +1,8 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 #include <ark/async/io_uring/io_uring.hpp>
 
@@ -250,3 +251,5 @@ public:
 };
 } // namespace io_uring_async
 } // namespace ark
+
+/*! \endcond */

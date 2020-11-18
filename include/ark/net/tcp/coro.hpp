@@ -1,8 +1,6 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
-#include <ark/coro_bindings.hpp>
 
 #include <ark/async/context.hpp>
 #include <ark/coroutine/awaitable_op.hpp>
@@ -12,8 +10,19 @@
 
 namespace ark {
 namespace net {
+
+/*! \addtogroup net
+ *  @{
+ */
+
 namespace tcp {
+
+/*!
+ * \brief contains apis that returns an Awaitable
+ */
 namespace coro {
+
+/*! \cond HIDDEN_CLASSES */
 
 struct connect_awaitable : public awaitable_op<result<void>> {
   socket &f_;
@@ -27,9 +36,18 @@ struct connect_awaitable : public awaitable_op<result<void>> {
   }
 };
 
+/*! \endcond */
+
+/*!
+ * \brief connect socket to the given endpoint
+ *
+ * returns an Awaitable which yields an result<void> when co_awaited.
+ */
 inline auto connect(socket &f, const address &endpoint) noexcept {
   return connect_awaitable(f, endpoint);
 }
+
+/*! \cond HIDDEN_CLASSES */
 
 struct accept_with_ep_awaitable : public awaitable_op<result<socket>> {
   acceptor &srv_;
@@ -53,13 +71,30 @@ struct accept_awaitable : public awaitable_op<result<socket>> {
   }
 };
 
+/*! \endcond */
+
+/*!
+ * \brief accept a socket connection from the given acceptor
+ *
+ * returns an Awaitable which yields an result<socket> when co_awaited.
+ *
+ * \param[out] endpoint the address of accepted socket, on success
+ */
 inline auto accept(acceptor &srv, address &endpoint) noexcept {
   return accept_with_ep_awaitable(srv, endpoint);
 }
 
+/*!
+ * \brief accept a socket connection from the given acceptor
+ *
+ * returns an Awaitable which yields an result<socket> when co_awaited.
+ */
 inline auto accept(acceptor &srv) noexcept { return accept_awaitable(srv); }
 
 } // namespace coro
 } // namespace tcp
+
+/*! @} */
+
 } // namespace net
 } // namespace ark

@@ -1,6 +1,8 @@
 #pragma once
 
-#include <ark/bindings.hpp>
+/*! \cond FILE_NOT_DOCUMENTED */
+
+#include <ark/bindings/bindings.hpp>
 
 #include <experimental/coroutine>
 #include <future>
@@ -12,3 +14,5 @@ using std::experimental::coroutine_handle;
 using std::experimental::suspend_always;
 using std::experimental::suspend_never;
 } // namespace ark
+
+/*! \endcond */

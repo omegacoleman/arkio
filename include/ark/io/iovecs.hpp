@@ -1,7 +1,10 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
+
+#include <ark/buffer.hpp>
 
 namespace ark {
 
@@ -48,3 +51,5 @@ inline auto to_iovecs(const ConstBufferSequence &bseq, size_t skip,
   return move(ret);
 }
 } // namespace ark
+
+/*! \endcond */

@@ -1,10 +1,21 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
-#include <ark/coro_bindings.hpp>
 
 namespace ark {
 
+/*!
+ * \brief coroutine functions returning this type is internally cut-off with the
+ * caller.
+ *
+ * Even if the caller discard the returning value, the undelying coroutine won't
+ * get halted.
+ *
+ * Not exposed in concerns the caller would be 'too forgetful', use co_async
+ * instead.
+ */
 class fire_and_forget {
 public:
   class promise_type {
@@ -24,3 +35,5 @@ public:
 };
 
 } // namespace ark
+
+/*! \endcond */

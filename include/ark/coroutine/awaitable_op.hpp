@@ -1,7 +1,8 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
-#include <ark/coro_bindings.hpp>
 
 #include <ark/async.hpp>
 
@@ -46,3 +47,5 @@ public:
 };
 
 } // namespace ark
+
+/*! \endcond */

@@ -1,5 +1,7 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
 
 namespace ark {
@@ -9,7 +11,7 @@ public:
   manual_lifetime() noexcept {}
   ~manual_lifetime() noexcept {}
 
-  template <class... Args> void construct(Args &&... args) noexcept {
+  template <class... Args> void construct(Args &&...args) noexcept {
     ::new (static_cast<void *>(addressof(value)))
         T(static_cast<Args &&>(args)...);
   }
@@ -58,3 +60,5 @@ template <> struct manual_lifetime<void> {
 };
 
 } // namespace ark
+
+/*! \endcond */

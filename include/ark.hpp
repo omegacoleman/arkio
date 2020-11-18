@@ -1,5 +1,10 @@
 #pragma once
 
+/*!
+ * \brief grand namespace for all non-specific symbols of arkio
+ */
+namespace ark {} // namespace ark
+
 #include <ark/async.hpp>
 #include <ark/buffer.hpp>
 #include <ark/general.hpp>

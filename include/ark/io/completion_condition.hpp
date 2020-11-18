@@ -4,6 +4,12 @@
 
 namespace ark {
 
+/*! \addtogroup io
+ *  @{
+ */
+
+/*! \cond HIDDEN_CLASSES */
+
 struct transfer_all_t {
   template <class ConstBufferSequence>
   size_t operator()(const ConstBufferSequence &b, size_t done) noexcept {
@@ -32,7 +38,32 @@ struct transfer_exactly_t {
   }
 };
 
+/*! \endcond */
+
+/*!
+ * \brief returns a CompletionCondition which denotes transfering until all
+ * bytes in provided buffer is done.
+ *
+ * \remark see \ref info_network
+ */
 constexpr auto transfer_all() noexcept { return transfer_all_t{}; }
+
+/*!
+ * \brief returns a CompletionCondition which denotes transfering at least n
+ * bytes, or until all bytes in provided buffer is done.
+ *
+ * \remark see \ref info_network
+ */
 auto transfer_at_least(size_t n) noexcept { return transfer_at_least_t{n}; }
+
+/*!
+ * \brief returns a CompletionCondition which denotes transfering exactly n
+ * bytes, or until all bytes in provided buffer is done.
+ *
+ * \remark see \ref info_network
+ */
 auto transfer_exactly(size_t n) noexcept { return transfer_exactly_t{n}; }
+
+/*! @} */
+
 } // namespace ark

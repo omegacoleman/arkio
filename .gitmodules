@@ -10,3 +10,6 @@
 [submodule "vendor/outcome"]
 	path = vendor/outcome
 	url = https://github.com/ned14/outcome
+[submodule "vendor/m.css"]
+	path = vendor/m.css
+	url = https://github.com/mosra/m.css

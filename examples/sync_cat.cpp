@@ -13,10 +13,10 @@ using namespace ark;
 result<void> run(int argc, char **argv) {
 
   for (int i = 1; i < argc; i++) {
-    OUTCOME_TRY(f, normal_file::open({argv[i]}, O_RDONLY));
+    auto f = TryX(normal_file::open({argv[i]}, O_RDONLY));
     std::array<char, 1024> buf;
     for (;;) {
-      OUTCOME_TRY(sz, sync::read(f, buffer(buf), transfer_at_least(1)));
+      size_t sz = TryX(sync::read(f, buffer(buf), transfer_at_least(1)));
       if (sz == 0) {
         break;
       }

@@ -107,20 +107,20 @@ struct echo_server : public std::enable_shared_from_this<echo_server> {
 
 result<void> run() {
   async_context ctx;
-  OUTCOME_TRY(ctx.init());
+  TryX(ctx.init());
 
   net::inet_address ep;
-  OUTCOME_TRY(ep.host("127.0.0.1"));
+  TryX(ep.host("127.0.0.1"));
   ep.port(8080);
 
-  OUTCOME_TRY(ac, tcp::acceptor::create(ctx));
-  OUTCOME_TRY(tcp::bind(ac, ep));
-  OUTCOME_TRY(tcp::listen(ac));
+  auto ac = TryX(tcp::acceptor::create(ctx));
+  TryX(tcp::bind(ac, ep));
+  TryX(tcp::listen(ac));
 
   auto srv = std::make_shared<echo_server>(std::move(ac));
   srv->run();
 
-  OUTCOME_TRY(ctx.run());
+  TryX(ctx.run());
   return success();
 }
 

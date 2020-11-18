@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 #include <ark/async.hpp>
 #include <ark/buffer.hpp>
@@ -10,7 +9,14 @@
 #include <ark/io/seekable/seekable_fd.hpp>
 
 namespace ark {
+
+/*! \addtogroup io
+ *  @{
+ */
+
 namespace async {
+
+/*! \cond HIDDEN_CLASSES */
 
 template <class CompletionCondition> struct seekable_read_buffer_sequence_impl {
   struct locals_t {
@@ -128,6 +134,13 @@ struct seekable_write_buffer_sequence_impl {
   }
 };
 
+/*! \endcond */
+
+/*!
+ * \brief read from fd to buffer until eof or completion condition is met.
+ *
+ * returns instantly, cb is invoked on completion or error.
+ */
 template <class MutableBufferSequence, class CompletionCondition>
 inline void read(seekable_fd &f, const MutableBufferSequence &b,
                  CompletionCondition cond,
@@ -139,6 +152,11 @@ inline void read(seekable_fd &f, const MutableBufferSequence &b,
       .run();
 }
 
+/*!
+ * \brief write to fd from buffer until completion condition is met.
+ *
+ * returns instantly, cb is invoked on completion or error.
+ */
 template <class ConstBufferSequence, class CompletionCondition>
 inline void write(seekable_fd &f, const ConstBufferSequence &b,
                   CompletionCondition cond,
@@ -150,12 +168,24 @@ inline void write(seekable_fd &f, const ConstBufferSequence &b,
       .run();
 }
 
+/*!
+ * \brief read from fd to buffer until eof or completion condition is met.
+ *
+ * returns instantly, cb is invoked on completion or error, same as read(f, b,
+ * transfer_all(), cb).
+ */
 template <class MutableBufferSequence>
 inline void read(seekable_fd &f, const MutableBufferSequence &b,
                  callback<result<size_t>> &&cb) noexcept {
   read(f, b, transfer_all(), forward<callback<result<size_t>>>(cb));
 }
 
+/*!
+ * \brief write to fd from buffer until completion condition is met.
+ *
+ * returns instantly, cb is invoked on completion or error, same as write(f, b,
+ * transfer_all(), cb).
+ */
 template <class ConstBufferSequence>
 inline void write(seekable_fd &f, const ConstBufferSequence &b,
                   callback<result<size_t>> &&cb) noexcept {
@@ -163,4 +193,7 @@ inline void write(seekable_fd &f, const ConstBufferSequence &b,
 }
 
 } // namespace async
+
+/*! @} */
+
 } // namespace ark

@@ -6,8 +6,21 @@
 #include <ark/io.hpp>
 
 namespace ark {
+
+/*! \addtogroup general
+ *  @{
+ */
+
+/*!
+ * \brief wraps fildes created by eventfd(2) as an io object
+ */
 class event_fd : public nonseekable_fd {
 protected:
+  /*!
+   * \brief constructs from int fildes
+   *
+   * \param[in] fd_int must be an fildes opened by eventfd(2)
+   */
   event_fd(int fd_int) : nonseekable_fd(fd_int) {}
 
 private:
@@ -23,13 +36,23 @@ private:
   }
 
 public:
+  /*!
+   * \brief construct and return an event_fd just like calling eventfd(2)
+   */
   static result<event_fd> create(unsigned int count, int flags) noexcept {
     return __create(nullptr, count, flags);
   }
 
+  /*!
+   * \brief construct and return an event_fd just like calling eventfd(2), and
+   * bind to the given \ref ::ark::async_context
+   */
   static result<event_fd> create(async_context &ctx, unsigned int count,
                                  int flags) noexcept {
     return __create(&ctx, count, flags);
   }
 };
+
+/*! @} */
+
 } // namespace ark

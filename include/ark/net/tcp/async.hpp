@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 #include <ark/async/async_op.hpp>
 #include <ark/async/context.hpp>
@@ -11,9 +10,23 @@
 
 namespace ark {
 namespace net {
+
+/*! \addtogroup net
+ *  @{
+ */
+
 namespace tcp {
+
+/*!
+ * \brief contains apis that invokes a given \ref ::ark::callback on completion
+ */
 namespace async {
 
+/*!
+ * \brief connect socket to the given endpoint
+ *
+ * returns instantly, cb is invoked on completion or error.
+ */
 inline void connect(socket &f, const address &endpoint,
                     callback<result<void>> &&cb) noexcept {
   auto ret = async_syscall::connect(
@@ -26,6 +39,8 @@ inline void connect(socket &f, const address &endpoint,
   if (ret.has_error())
     cb(ret.as_failure());
 }
+
+/*! \cond HIDDEN_CLASSES */
 
 struct accept_with_address_impl {
   struct locals_t {
@@ -56,6 +71,15 @@ struct accept_with_address_impl {
   }
 };
 
+/*! \endcond */
+
+/*!
+ * \brief accept a socket connection from the given acceptor
+ *
+ * returns instantly, cb is invoked on completion or error.
+ *
+ * \param[out] endpoint the address of accepted socket, on success
+ */
 inline void accept(acceptor &srv, address &endpoint,
                    callback<result<socket>> &&cb) noexcept {
   using impl_t = accept_with_address_impl;
@@ -64,6 +88,11 @@ inline void accept(acceptor &srv, address &endpoint,
       .run();
 }
 
+/*!
+ * \brief accept a socket connection from the given acceptor
+ *
+ * returns instantly, cb is invoked on completion or error.
+ */
 inline void accept(acceptor &srv, callback<result<socket>> &&cb) noexcept {
   auto ret = async_syscall::accept(
       srv.context(), srv.get(), NULL, NULL, 0,
@@ -79,5 +108,8 @@ inline void accept(acceptor &srv, callback<result<socket>> &&cb) noexcept {
 
 } // namespace async
 } // namespace tcp
+
+/*! @} */
+
 } // namespace net
 } // namespace ark

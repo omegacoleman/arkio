@@ -1,7 +1,8 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 #include <ark/async/callback.hpp>
 #include <ark/async/io_uring/io_uring.hpp>
@@ -77,3 +78,5 @@ accept(UringContext &ctx, int fd, clinux::sockaddr *addr,
 } // namespace syscall
 } // namespace io_uring_async
 } // namespace ark
+
+/*! \endcond */

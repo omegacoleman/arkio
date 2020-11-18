@@ -13,8 +13,8 @@ using namespace ark;
 task<result<void>> to_stdout(normal_file &f) {
   std::array<char, 1024> buf;
   for (;;) {
-    OUTCOME_CO_TRY(sz,
-                   co_await coro::read(f, buffer(buf), transfer_at_least(1)));
+    size_t sz =
+        CoTryX(co_await coro::read(f, buffer(buf), transfer_at_least(1)));
     if (sz == 0) {
       co_return success();
     }
@@ -28,8 +28,8 @@ task<result<void>> coro_cat(async_context &ctx,
   context_exit_guard g_(ctx);
 
   for (auto &filename : filenames) {
-    OUTCOME_CO_TRY(f, normal_file::open(ctx, filename, O_RDONLY));
-    OUTCOME_CO_TRY(co_await to_stdout(f));
+    auto f = CoTryX(normal_file::open(ctx, filename, O_RDONLY));
+    CoTryX(co_await to_stdout(f));
   }
 
   co_return success();
@@ -37,15 +37,15 @@ task<result<void>> coro_cat(async_context &ctx,
 
 result<void> run(int argc, char **argv) {
   async_context ctx;
-  OUTCOME_TRY(ctx.init());
+  TryX(ctx.init());
 
   std::vector<std::string> filenames{};
   for (int i = 1; i < argc; ++i)
     filenames.emplace_back(argv[i]);
 
   auto fut = co_async(coro_cat(ctx, filenames));
-  OUTCOME_TRY(ctx.run());
-  OUTCOME_TRY(fut.get());
+  TryX(ctx.run());
+  TryX(fut.get());
 
   return success();
 }

@@ -7,7 +7,17 @@
 #include <ark/io/completion_condition.hpp>
 
 namespace ark {
+
+/*! \addtogroup io
+ *  @{
+ */
+
+/*!
+ * \brief contains apis that returns an Awaitable
+ */
 namespace coro {
+
+/*! \cond HIDDEN_CLASSES */
 
 template <class Fd, class MutableBufferSequence, class CompletionCondition>
 struct read_awaitable : public awaitable_op<result<size_t>> {
@@ -37,27 +47,56 @@ struct write_awaitable : public awaitable_op<result<size_t>> {
   }
 };
 
+/*! \endcond */
+
+/*!
+ * \brief returns an Awaitable which read from fd to buffer until eof or
+ * completion condition is met.
+ *
+ * returns an Awaitable which yields an result<size_t> when co_awaited.
+ */
 template <class Fd, class MutableBufferSequence, class CompletionCondition>
 inline auto read(Fd &f, const MutableBufferSequence &b,
                  CompletionCondition cond) noexcept {
   return read_awaitable(f, b, cond);
 }
 
+/*!
+ * \brief returns an Awaitable which write to fd from buffer until completion
+ * condition is met.
+ *
+ * returns an Awaitable which yields an result<size_t> when co_awaited.
+ */
 template <class Fd, class ConstBufferSequence, class CompletionCondition>
 inline auto write(Fd &f, const ConstBufferSequence &b,
                   CompletionCondition cond) noexcept {
   return write_awaitable(f, b, cond);
 }
 
+/*!
+ * \brief returns an Awaitable which read from fd to buffer until eof or
+ * completion condition is met.
+ *
+ * same as read(f, b, transfer_all())
+ */
 template <class Fd, class MutableBufferSequence>
 inline auto read(Fd &f, const MutableBufferSequence &b) noexcept {
   return read_awaitable(f, b, transfer_all());
 }
 
+/*!
+ * \brief returns an Awaitable which write to fd from buffer until completion
+ * condition is met.
+ *
+ * same as write(f, b, transfer_all())
+ */
 template <class Fd, class ConstBufferSequence>
 inline auto write(Fd &f, const ConstBufferSequence &b) noexcept {
   return write_awaitable(f, b, transfer_all());
 }
 
 } // namespace coro
+
+/*! @} */
+
 } // namespace ark

@@ -6,8 +6,21 @@
 #include <ark/io.hpp>
 
 namespace ark {
+
+/*! \addtogroup general
+ *  @{
+ */
+
+/*!
+ * \brief wraps fildes created by pipe2(2) as an io object
+ */
 class pipe_fd : public nonseekable_fd {
 protected:
+  /*!
+   * \brief constructs from int fildes
+   *
+   * \param[in] fd_int must be an fildes opened by pipe2(2)
+   */
   pipe_fd(int fd_int) : nonseekable_fd(fd_int) {}
 
 private:
@@ -25,12 +38,26 @@ private:
   }
 
 public:
+  /*!
+   * \brief construct a std::pair of pipe_fd just like calling pipe2(2)
+   *
+   * on success, returns the {in, out} end of the pipe as a pair
+   */
   static result<pair<pipe_fd, pipe_fd>> create() noexcept {
     return __create(nullptr);
   }
 
+  /*!
+   * \brief construct a std::pair of pipe_fd just like calling pipe2(2), and
+   * bind both of them to the given \ref ::ark::async_context
+   *
+   * on success, returns the {in, out} end of the pipe as a pair
+   */
   static result<pair<pipe_fd, pipe_fd>> create(async_context &ctx) noexcept {
     return __create(&ctx);
   }
 };
+
+/*! @} */
+
 } // namespace ark

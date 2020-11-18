@@ -1,7 +1,9 @@
 #pragma once
 
-#include "gtest/gtest.h"
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <ark/bindings.hpp>
+#include <gtest/gtest.h>
 
 #define TEST_R(_x_suite, _x_name)                                              \
   ark::result<void> _x_suite##_##_x_name##_body();                             \
@@ -15,3 +17,5 @@
   }                                                                            \
                                                                                \
   ark::result<void> _x_suite##_##_x_name##_body()
+
+/*! \endcond */

@@ -1,9 +1,10 @@
 #pragma once
 
+/*! \cond FILE_NOT_DOCUMENTED */
+
 #include <liburing.h>
 
 #include <ark/bindings.hpp>
-#include <ark/clinux.hpp>
 
 namespace ark {
 namespace io_uring_async {
@@ -250,3 +251,5 @@ public:
 };
 } // namespace io_uring_async
 } // namespace ark
+
+/*! \endcond */

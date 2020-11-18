@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ark/bindings.hpp>
-#include <ark/coro_bindings.hpp>
 
 #include <ark/async/context.hpp>
 #include <ark/coroutine/fire_and_forget.hpp>
@@ -9,8 +8,18 @@
 
 namespace ark {
 
-// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1056r0.html
-// mentioned task varaint of std::async
+/*! \addtogroup coroutine
+ *  @{
+ */
+
+/*!
+ * \brief start the task as another coroutine task series.
+ *
+ * the caller losts ownership of the task once started, so discarding the
+ * returned future does not abort the task from running.
+ *
+ * \remark as defined in p1056r0 (with a different name), see \ref info_coro
+ */
 template <typename T> inline future<T> co_async(task<T> tsk) noexcept {
   promise<T> prom_;
   auto fut = prom_.get_future();
@@ -24,5 +33,7 @@ template <typename T> inline future<T> co_async(task<T> tsk) noexcept {
   })(move(prom_), move(tsk));
   return fut;
 }
+
+/*! @} */
 
 } // namespace ark
