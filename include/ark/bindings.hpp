@@ -33,6 +33,7 @@ using outcome::result;
 using outcome::success;
 using std::abort;
 using std::add_const_t;
+using std::add_pointer_t;
 using std::addressof;
 using std::array;
 using std::basic_string;
