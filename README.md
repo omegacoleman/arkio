@@ -13,86 +13,7 @@ The _proactor_ design pattern demultiplexes and dispatches events asynchronously
 
 # examples
 
-## coroutine echo server
-
-``` c++
-#include <array>
-#include <iostream>
-#include <memory>
-#include <string>
-#include <utility>
-
-#include <ark.hpp>
-
-// #define PRINT_ACCESS_LOG
-
-namespace program {
-
-using namespace ark;
-namespace tcp = net::tcp;
-
-task<result<void>> handle_conn(tcp::socket s) {
-  for (;;) {
-    std::array<char, 1024> buf;
-
-    OUTCOME_CO_TRY(sz,
-                   co_await coro::read(s, buffer(buf), transfer_at_least(1)));
-
-    if (sz == 0)
-      break;
-
-    OUTCOME_CO_TRY(co_await coro::write(s, buffer(buf, sz)));
-  }
-  co_return success();
-}
-
-task<void> run_handle_conn(tcp::socket s) {
-  auto ret = co_await handle_conn(std::move(s));
-  if (ret.has_error())
-    std::cerr << ret.error().message() << std::endl;
-}
-
-task<result<void>> echo_srv(tcp::acceptor &ac) {
-  context_exit_guard g_(ac.context());
-
-  for (;;) {
-    OUTCOME_CO_TRY(s, co_await tcp::coro::accept(ac));
-    co_async(run_handle_conn(std::move(s)));
-  }
-}
-
-result<void> run() {
-  async_context ctx;
-  OUTCOME_TRY(ctx.init());
-
-  net::inet_address ep;
-  OUTCOME_TRY(ep.host("127.0.0.1"));
-  ep.port(8080);
-
-  OUTCOME_TRY(ac, tcp::acceptor::create(ctx));
-  OUTCOME_TRY(tcp::bind(ac, ep));
-  OUTCOME_TRY(tcp::listen(ac));
-
-  auto fut = co_async(echo_srv(ac));
-  OUTCOME_TRY(ctx.run());
-  OUTCOME_TRY(fut.get());
-
-  return success();
-}
-
-} // namespace program
-
-int main(void) {
-  auto ret = program::run();
-  if (ret.has_error()) {
-    std::cerr << "error : " << ret.error().message() << std::endl;
-    std::abort();
-  }
-  return 0;
-}
-```
-
-see full example at `examples/coro_echo_server.cpp`
+**See: <https://arkio.yccb.me/page_examples.html>**
 
 # usage
 
@@ -108,7 +29,7 @@ Coroutine TS related parts demands c++20 to compile, the others are written in c
 
 ## compiling tests and examples
 
-### on fedora 32
+### on fedora 31+
 
 ```
 sudo dnf install -y cmake liburing-devel clang libcxx
@@ -157,7 +78,7 @@ remember to include and link liburing by yourself.
 
 By the time of writing, asio is still using epoll as its low-level kernel interface, which imitates the proactor pattern with reactor pattern. This is inaffective and requires many epoll-only magic techniques. What's more, the asio interface was designed cross-platform, but it is affected greatly by the iocp interface of Microsoft windows. From 5.1, kernel introduced a set of new API named io-uring, which enables us to create real proactor implementions with a great performance boost. This library aims to port that functionality to c++, with APIs tailored just for linux.
 
-This library aims to get away with those historical burden and a few others. By making use of Coroutine TS and GSL and outcome, modern c++ programming is getting powerful and free as it had never be. IO programming is a major use case of c++, and this library exist to port that enlightment to it.
+This library aims to get away with those historical burden and a few others. By making use of Coroutine TS and GSL and outcome, modern c++ programming is getting powerful and free as it had never be. IO programming is a major use case of c++, and this library exist to port that enlightenment to it.
 
 # a few notes
 
