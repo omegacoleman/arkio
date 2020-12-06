@@ -135,7 +135,7 @@
  * ...
  *
  * In addition, some parts of this library is coded 100% compatible to the
- * lastest draft standard of networking ts,
+ * latest draft standard of networking ts,
  * n4771(http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4771.pdf):
  *
  * - the whole \ref buffer module

@@ -14,7 +14,7 @@ namespace net {
 namespace tcp {
 
 /*!
- * \brief special io object avalible to bond, listen, and accept \ref
+ * \brief special io object available to bond, listen, and accept \ref
  * ark::net::tcp::socket from
  */
 class acceptor : public nonseekable_fd {

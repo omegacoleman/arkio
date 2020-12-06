@@ -49,7 +49,7 @@ public:
   result<void> run() noexcept;
 
   /*!
-   * \brief let run() succesfully return
+   * \brief let run() successfully return
    */
   void exit() noexcept;
 

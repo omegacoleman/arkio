@@ -10,8 +10,8 @@ namespace ark {
  * \brief coroutine functions returning this type is internally cut-off with the
  * caller.
  *
- * Even if the caller discard the returning value, the undelying coroutine won't
- * get halted.
+ * Even if the caller discard the returning value, the underlying coroutine
+ * won't get halted.
  *
  * Not exposed in concerns the caller would be 'too forgetful', use co_async
  * instead.

@@ -3,7 +3,7 @@
 namespace ark {
 namespace net {
 /*!
- * \brief implements TCP/TP related classes and functions
+ * \brief implements TCP/IP related classes and functions
  */
 namespace tcp {}
 } // namespace net

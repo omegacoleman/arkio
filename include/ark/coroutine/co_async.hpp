@@ -15,7 +15,7 @@ namespace ark {
 /*!
  * \brief start the task as another coroutine task series.
  *
- * the caller losts ownership of the task once started, so discarding the
+ * the caller lost ownership of the task once it is started, so discarding the
  * returned future does not abort the task from running.
  *
  * \remark as defined in p1056r0 (with a different name), see \ref info_coro

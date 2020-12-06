@@ -85,7 +85,7 @@ size_t buffer_size(const ConstBufferSequence &buffers) noexcept {
 /*!
  * \brief copy the underlying bytes from one buffer to another
  *
- * \param[in] max_size the maxium bytes allowed to copy
+ * \param[in] max_size the max bytes allowed to copy
  *
  * \pre no overlaps allowed between source and dest, otherwise the behavior is
  * undefined

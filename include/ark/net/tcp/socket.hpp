@@ -24,7 +24,7 @@ inline socket wrap_accepted_socket(async_context *ctx, int fd) noexcept;
 /*!
  * \brief denotes a tcp socket
  *
- * will be availble for io after a successful connect operation, sync or async,
+ * will be available for io after a successful connect operation, sync or async,
  * or if the socket is retrieved by accepting from an \ref
  * ::ark::net::tcp::acceptor
  */
@@ -56,7 +56,7 @@ public:
   /*! \endcond */
 
   /*!
-   * \brief constructs a socket availble for connecting
+   * \brief constructs a socket available for connecting
    *
    * \param[in] use_ipv6 if set to true, associated connect should use \ref
    * ark::net::inet6_address
@@ -66,7 +66,7 @@ public:
   }
 
   /*!
-   * \brief constructs a socket availble for connecting
+   * \brief constructs a socket available for connecting
    *
    * \param[in] ctx bound to this \ref ark::async_context in addition, notice
    * that it would also be bound for accepted sockets \param[in] use_ipv6 if set

@@ -3,7 +3,7 @@
 /*! \addtogroup general
  *  \brief This module contains general io objects like pipes or files
  *
- * While network related io objects has many arbitary dependencies like
+ * While network related io objects has many dependencies like
  * addresses, some of others remain simple like pipes, files, etc. Those io
  * objects inherit from \ref ::ark::seekable_fd and \ref ::ark::nonseekable_fd,
  * and provides functions for constructing them.

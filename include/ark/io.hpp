@@ -4,7 +4,7 @@
  *  \brief This module provides base class for io objects and corresponding read
  * / write functions.
  *
- *  The read / write functions were provided in three flavours, under three
+ *  The read / write functions were provided in three flavors, under three
  * namespaces:
  *  - \ref ::ark::sync
  *  - \ref ::ark::async

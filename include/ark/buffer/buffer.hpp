@@ -20,7 +20,7 @@ namespace ark {
  * Notice that the base_buffer represents an unowning view of the underlying
  * type, and marks it for usage of buffered io operations like ark::sync::read
  * and ark::sync:write. It's the user's responsibility to keep the underlying
- * memory avalible before any io operation completes.
+ * memory available before any io operation completes.
  *
  * \tparam CharT type of chars, if const qualified, then the buffer is immutable
  * and the data should not get modified. Ill-formed if sizeof(CharT) != 1
