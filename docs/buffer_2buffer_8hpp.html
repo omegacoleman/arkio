@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>include/ark/buffer/buffer.hpp file | arkio async io-uring based kernel io library</title>
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">arkio <span class="m-thin">async io-uring based kernel io library</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="pages.html">Pages</a></li>
+            <li><a href="page_examples.html">Examples</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="https://github.com/omegacoleman/arkio">GitHub</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a>/</span><span class="m-breadcrumb"><a href="dir_67e36f4c473fc7217919a986e35260a0.html">ark</a>/</span><span class="m-breadcrumb"><a href="dir_0e7273df525b03ecb41c43e0b66b74d3.html">buffer</a>/</span>buffer.hpp <span class="m-thin">file</span>
+        </h1>
+        <p><span></span></p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#namespaces">Namespaces</a></li>
+                <li><a href="#nested-classes">Classes</a></li>
+                <li><a href="#typedef-members">Typedefs</a></li>
+                <li><a href="#func-members">Functions</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <section id="namespaces">
+          <h2><a href="#namespaces">Namespaces</a></h2>
+          <dl class="m-doc">
+            <dt>namespace <a href="namespaceark.html" class="m-doc">ark</a></dt>
+            <dd>grand namespace for all non-specific symbols of arkio</dd>
+          </dl>
+        </section>
+        <section id="nested-classes">
+          <h2><a href="#nested-classes">Classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template&lt;typename CharT&gt;</div>
+              class <a href="classark_1_1base__buffer.html" class="m-doc">ark::base_buffer</a>
+            </dt>
+            <dd>base type for mutable_buffer and const_buffer</dd>
+          </dl>
+        </section>
+        <section id="typedef-members">
+          <h2><a href="#typedef-members">Typedefs</a></h2>
+          <dl class="m-doc">
+            <dt>
+              using <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">mutable_buffer</a> = base_buffer&lt;char&gt;
+            </dt>
+            <dd>a view to a span of memory as mutable buffer</dd>
+            <dt>
+              using <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">const_buffer</a> = base_buffer&lt;const char&gt;
+            </dt>
+            <dd>a view to a span of memory as const buffer</dd>
+          </dl>
+        </section>
+        <section id="func-members">
+          <h2><a href="#func-members">Functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gad901916e3ceead42dd93a16746c425c4" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gaa5c95bce30b14d85d2070f6c4558903a" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">size_t n,
+              const mutable_buffer&amp; b) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga117845a180e3f1436038da620c5a77a0" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gaf800f3d2fb172dd9abc540f5dc969a6b" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">size_t n,
+              const const_buffer&amp; b) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gabbc46bbdd8b57608c85a8c46e8fcac02" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">void* p,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga4c472dc19a941e4efb8b83a6b12fd56b" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const void* p,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gac4fb90e1f7f261f4376baf768f83448b" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga85ae6cb4208675aee2248090ea8544c3" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gaaaa42c1e7f22d160af3002df891fa319" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gae8161cf130fbc09d073cefdf28254ac6" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga5dd55c6e19842b361bb8338c5e222120" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">T(&amp;data)[N]) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gad58854d1bbb2e82cab9406015466630c" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const T(&amp;data)[N]) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gaeb9f45e25ecaa3c60301c4bf8bebf4d0" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;T, N&gt;&amp; data) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga78ed71b52881469077a620c3714f1686" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;const T, N&gt;&amp; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gacabf789e27671abf9971aeb08c048184" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">vector&lt;T, Allocator&gt;&amp; data) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga5a5415ef76ec0948b7b15956108ddab4" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const vector&lt;T, Allocator&gt;&amp; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga03b5e9468b56e0750907251052c31914" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string&lt;CharT, Traits, Allocator&gt;&amp; data) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gaca07217bb73846719db30d3900ff7214" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const basic_string&lt;CharT, Traits, Allocator&gt;&amp; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gaae8a5fae8b0c6fb0266fdef4cd487a15" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string_view&lt;CharT, Traits&gt; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga01ccaebec740f06831dd549cdef59a18" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">T(&amp;data)[N],
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gad1c1d6eeda7db1871cd1784732a5e0da" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const T(&amp;data)[N],
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gabef76e2272da473d88969a772b6543d6" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;T, N&gt;&amp; data,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga31f0b66f5f6a643b935db781f03d9b7c" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;const T, N&gt;&amp; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga7f5cf4f68b6d5812aba4b808f1cf6243" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">vector&lt;T, Allocator&gt;&amp; data,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gabbe8ddd52bc0c681170b9f8806235bd4" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const vector&lt;T, Allocator&gt;&amp; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga7d611f93ef654e28f7619af62811c126" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string&lt;CharT, Traits, Allocator&gt;&amp; data,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#gac77d6eb0aea0ad854b92cdd6e376531d" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const basic_string&lt;CharT, Traits, Allocator&gt;&amp; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="group__buffer.html#ga3b47e23f6bd3736df121fe650512bb4c" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string_view&lt;CharT, Traits&gt; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+          </dl>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script src="searchdata-v1.js" async="async"></script>
+</body>
+</html>

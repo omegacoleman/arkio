@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Buffer module | arkio async io-uring based kernel io library</title>
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">arkio <span class="m-thin">async io-uring based kernel io library</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="pages.html">Pages</a></li>
+            <li><a href="page_examples.html">Examples</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="https://github.com/omegacoleman/arkio">GitHub</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          Buffer <span class="m-thin">module</span></h1>
+        <p>This module provides buffer implemention as defined in N4771 Networking TS draft&#x27;s &#x27;Buffer&#x27; section.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#nested-classes">Classes</a></li>
+                <li><a href="#typedef-members">Typedefs</a></li>
+                <li><a href="#func-members">Functions</a></li>
+                <li><a href="#var-members">Variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+<aside class="m-note m-default"><h4>See also</h4><p><a href="info_network.html" class="m-doc">the Networking TS</a></p></aside><p>Buffers are built upon gsl::span, and the buffers all inherit from spans. See <a href="classark_1_1base__buffer.html" class="m-doc">ark::<wbr />base_buffer</a> for details. gsl::span has bound checks, which also make buffers of this module &#x27;safe buffers&#x27; with bound checks, too.</p><p>for more information about gsl: <a href="https://github.com/microsoft/GSL/">https:/<wbr />/<wbr />github.com/<wbr />microsoft/<wbr />GSL/<wbr /></a></p>
+        <section id="nested-classes">
+          <h2><a href="#nested-classes">Classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template&lt;typename CharT&gt;</div>
+              class <a href="classark_1_1base__buffer.html" class="m-doc">ark::base_buffer</a>
+            </dt>
+            <dd>base type for mutable_buffer and const_buffer</dd>
+          </dl>
+        </section>
+        <section id="typedef-members">
+          <h2><a href="#typedef-members">Typedefs</a></h2>
+          <dl class="m-doc">
+            <dt>
+              using <a href="#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">mutable_buffer</a> = base_buffer&lt;char&gt;
+            </dt>
+            <dd>a view to a span of memory as mutable buffer</dd>
+            <dt>
+              using <a href="#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">const_buffer</a> = base_buffer&lt;const char&gt;
+            </dt>
+            <dd>a view to a span of memory as const buffer</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              using <a href="#ga305554990904df4b949cb7a3e240d16c" class="m-doc">is_mutable_buffer_sequence</a> = decltype(detail::is_mutable_buffer_sequence_impl&lt;T&gt;(0))
+            </dt>
+            <dd>std::true_type if T is a MutableBufferSequence</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              using <a href="#gac2c6478982dac5b9d3f21cae05265f1c" class="m-doc">is_const_buffer_sequence</a> = decltype(detail::is_const_buffer_sequence_impl&lt;T&gt;(0))
+            </dt>
+            <dd>std::true_type if T is a ConstBufferSequence</dd>
+          </dl>
+        </section>
+        <section id="func-members">
+          <h2><a href="#func-members">Functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gad901916e3ceead42dd93a16746c425c4" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gaa5c95bce30b14d85d2070f6c4558903a" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">size_t n,
+              const mutable_buffer&amp; b) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga117845a180e3f1436038da620c5a77a0" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gaf800f3d2fb172dd9abc540f5dc969a6b" class="m-doc">operator+</a>(</span><span class="m-doc-wrap">size_t n,
+              const const_buffer&amp; b) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an ascended buffer by n bytes</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gabbc46bbdd8b57608c85a8c46e8fcac02" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">void* p,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga4c472dc19a941e4efb8b83a6b12fd56b" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const void* p,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gac4fb90e1f7f261f4376baf768f83448b" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga85ae6cb4208675aee2248090ea8544c3" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gaaaa42c1e7f22d160af3002df891fa319" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gae8161cf130fbc09d073cefdf28254ac6" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga5dd55c6e19842b361bb8338c5e222120" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">T(&amp;data)[N]) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gad58854d1bbb2e82cab9406015466630c" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const T(&amp;data)[N]) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gaeb9f45e25ecaa3c60301c4bf8bebf4d0" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;T, N&gt;&amp; data) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga78ed71b52881469077a620c3714f1686" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;const T, N&gt;&amp; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gacabf789e27671abf9971aeb08c048184" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">vector&lt;T, Allocator&gt;&amp; data) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga5a5415ef76ec0948b7b15956108ddab4" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const vector&lt;T, Allocator&gt;&amp; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga03b5e9468b56e0750907251052c31914" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string&lt;CharT, Traits, Allocator&gt;&amp; data) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gaca07217bb73846719db30d3900ff7214" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const basic_string&lt;CharT, Traits, Allocator&gt;&amp; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gaae8a5fae8b0c6fb0266fdef4cd487a15" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string_view&lt;CharT, Traits&gt; data) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga01ccaebec740f06831dd549cdef59a18" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">T(&amp;data)[N],
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gad1c1d6eeda7db1871cd1784732a5e0da" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const T(&amp;data)[N],
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gabef76e2272da473d88969a772b6543d6" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;T, N&gt;&amp; data,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, size_t N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga31f0b66f5f6a643b935db781f03d9b7c" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">array&lt;const T, N&gt;&amp; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga7f5cf4f68b6d5812aba4b808f1cf6243" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">vector&lt;T, Allocator&gt;&amp; data,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gabbe8ddd52bc0c681170b9f8806235bd4" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const vector&lt;T, Allocator&gt;&amp; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga7d611f93ef654e28f7619af62811c126" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string&lt;CharT, Traits, Allocator&gt;&amp; data,
+              size_t n) -&gt; mutable_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits, class Allocator&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gac77d6eb0aea0ad854b92cdd6e376531d" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">const basic_string&lt;CharT, Traits, Allocator&gt;&amp; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class CharT, class Traits&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga3b47e23f6bd3736df121fe650512bb4c" class="m-doc">buffer</a>(</span><span class="m-doc-wrap">basic_string_view&lt;CharT, Traits&gt; data,
+              size_t n) -&gt; const_buffer <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga5045f80493f3be0d4c653d8296a9f25e" class="m-doc">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b) -&gt; const mutable_buffer* <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator to the first buffer of ConstBufferSequence</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga00f7a394dab556cb337d52fa2ec1dbb5" class="m-doc">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b) -&gt; const const_buffer* <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator to the first buffer of ConstBufferSequence</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class C&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga6f2afe9886a7dfc41debbc356c2ca267" class="m-doc">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">C&amp; c) -&gt; auto <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator to the first buffer of ConstBufferSequence</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class C&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gac3c8d73e1485947b91ae79ead68b65e8" class="m-doc">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">const C&amp; c) -&gt; auto <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator to the first buffer of ConstBufferSequence</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#gacc80e534f0c0b9603c453c606a9a5c04" class="m-doc">buffer_sequence_end</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b) -&gt; const mutable_buffer* <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator past the last buffer of BufferSequence</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga1f9ca4e531da2b8ab5fdc3830f5b6ffc" class="m-doc">buffer_sequence_end</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b) -&gt; const const_buffer* <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator past the last buffer of BufferSequence</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class C&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga0bb6641a27fa85d38e27454ca4f46225" class="m-doc">buffer_sequence_end</a>(</span><span class="m-doc-wrap">C&amp; c) -&gt; auto <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator past the last buffer of BufferSequence</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class C&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga4ee78735a3aec659c9e8b5a2f39fcf5c" class="m-doc">buffer_sequence_end</a>(</span><span class="m-doc-wrap">const C&amp; c) -&gt; auto <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns an iterator past the last buffer of BufferSequence</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class ConstBufferSequence&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#gad152f37385e4beb8f9faf9d941c108cf" class="m-doc">buffer_size</a>(</span><span class="m-doc-wrap">const ConstBufferSequence&amp; buffers) -&gt; size_t <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>returns the sum size of a ConstBufferSequence</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class MutableBufferSequence, class ConstBufferSequence&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ga6bd4e7b8c1d8f03dadbef8e94763297e" class="m-doc">buffer_copy</a>(</span><span class="m-doc-wrap">const MutableBufferSequence&amp; dest,
+              const ConstBufferSequence&amp; source,
+              size_t max_size) -&gt; size_t</span>
+            </dt>
+            <dd>copy the underlying bytes from one buffer to another</dd>
+          </dl>
+        </section>
+        <section id="var-members">
+          <h2><a href="#var-members">Variables</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              bool <a href="#gab2bd8a530ae82113c32317531c0be54b" class="m-doc">is_mutable_buffer_sequence_v</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd>helper for is_mutable_buffer_sequence::value</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              bool <a href="#ga7c799cf70ab4163da3ba6ce39b145f86" class="m-doc">is_const_buffer_sequence_v</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd>helper for is_const_buffer_sequence::value</dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Typedef documentation</h2>
+          <section class="m-doc-details" id="ga94315e4ce78fbaf6fafb53eb9ba4d9aa"><div>
+            <h3>
+              using <a href="#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc-self">mutable_buffer</a> = base_buffer&lt;char&gt;
+            </h3>
+            <p>a view to a span of memory as mutable buffer</p>
+<aside class="m-note m-default"><h4>Remark</h4><p>[buffer.mutable] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gadfe0a1fd39251d654b117699e0865c08"><div>
+            <h3>
+              using <a href="#gadfe0a1fd39251d654b117699e0865c08" class="m-doc-self">const_buffer</a> = base_buffer&lt;const char&gt;
+            </h3>
+            <p>a view to a span of memory as const buffer</p>
+<aside class="m-note m-default"><h4>Remark</h4><p>[buffer.const] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga305554990904df4b949cb7a3e240d16c"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              using <a href="#ga305554990904df4b949cb7a3e240d16c" class="m-doc-self">is_mutable_buffer_sequence</a> = decltype(detail::is_mutable_buffer_sequence_impl&lt;T&gt;(0))
+            </h3>
+            <p>std::true_type if T is a MutableBufferSequence</p>
+<p>std::false_type otherwise.</p><p>A MutableBufferSequence denotes a type convertible to <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a>, or an iterable of it.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.traits] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gac2c6478982dac5b9d3f21cae05265f1c"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              using <a href="#gac2c6478982dac5b9d3f21cae05265f1c" class="m-doc-self">is_const_buffer_sequence</a> = decltype(detail::is_const_buffer_sequence_impl&lt;T&gt;(0))
+            </h3>
+            <p>std::true_type if T is a ConstBufferSequence</p>
+<p>std::false_type otherwise.</p><p>A ConstBufferSequence denotes a type convertible to <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, or an iterable of it.</p><p>By theory, a MutableBufferSequence is a ConstBufferSequence, but there&#x27;s no vice-versa.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.traits] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="gad901916e3ceead42dd93a16746c425c4"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gad901916e3ceead42dd93a16746c425c4" class="m-doc-self">operator+</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an ascended buffer by n bytes</p>
+<aside class="m-note m-default"><h4>Remark</h4><p>[buffer.arithmetic] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gaa5c95bce30b14d85d2070f6c4558903a"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gaa5c95bce30b14d85d2070f6c4558903a" class="m-doc-self">operator+</a>(</span><span class="m-doc-wrap">size_t n,
+              const mutable_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an ascended buffer by n bytes</p>
+<aside class="m-note m-default"><h4>Remark</h4><p>[buffer.arithmetic] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga117845a180e3f1436038da620c5a77a0"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga117845a180e3f1436038da620c5a77a0" class="m-doc-self">operator+</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an ascended buffer by n bytes</p>
+<aside class="m-note m-default"><h4>Remark</h4><p>[buffer.arithmetic] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gaf800f3d2fb172dd9abc540f5dc969a6b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gaf800f3d2fb172dd9abc540f5dc969a6b" class="m-doc-self">operator+</a>(</span><span class="m-doc-wrap">size_t n,
+              const const_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an ascended buffer by n bytes</p>
+<aside class="m-note m-default"><h4>Remark</h4><p>[buffer.arithmetic] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gabbc46bbdd8b57608c85a8c46e8fcac02"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gabbc46bbdd8b57608c85a8c46e8fcac02" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">void* p,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga4c472dc19a941e4efb8b83a6b12fd56b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga4c472dc19a941e4efb8b83a6b12fd56b" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const void* p,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gac4fb90e1f7f261f4376baf768f83448b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gac4fb90e1f7f261f4376baf768f83448b" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga85ae6cb4208675aee2248090ea8544c3"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga85ae6cb4208675aee2248090ea8544c3" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gaaaa42c1e7f22d160af3002df891fa319"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gaaaa42c1e7f22d160af3002df891fa319" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gae8161cf130fbc09d073cefdf28254ac6"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gae8161cf130fbc09d073cefdf28254ac6" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga5dd55c6e19842b361bb8338c5e222120"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga5dd55c6e19842b361bb8338c5e222120" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">T(&amp;data)[N]) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gad58854d1bbb2e82cab9406015466630c"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gad58854d1bbb2e82cab9406015466630c" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const T(&amp;data)[N]) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gaeb9f45e25ecaa3c60301c4bf8bebf4d0"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gaeb9f45e25ecaa3c60301c4bf8bebf4d0" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">array&lt;T, N&gt;&amp; data) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga78ed71b52881469077a620c3714f1686"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga78ed71b52881469077a620c3714f1686" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">array&lt;const T, N&gt;&amp; data) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gacabf789e27671abf9971aeb08c048184"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gacabf789e27671abf9971aeb08c048184" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">vector&lt;T, Allocator&gt;&amp; data) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga5a5415ef76ec0948b7b15956108ddab4"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga5a5415ef76ec0948b7b15956108ddab4" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const vector&lt;T, Allocator&gt;&amp; data) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga03b5e9468b56e0750907251052c31914"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class CharT, class Traits, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga03b5e9468b56e0750907251052c31914" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">basic_string&lt;CharT, Traits, Allocator&gt;&amp; data) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gaca07217bb73846719db30d3900ff7214"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class CharT, class Traits, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gaca07217bb73846719db30d3900ff7214" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const basic_string&lt;CharT, Traits, Allocator&gt;&amp; data) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gaae8a5fae8b0c6fb0266fdef4cd487a15"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class CharT, class Traits&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gaae8a5fae8b0c6fb0266fdef4cd487a15" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">basic_string_view&lt;CharT, Traits&gt; data) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga01ccaebec740f06831dd549cdef59a18"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga01ccaebec740f06831dd549cdef59a18" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">T(&amp;data)[N],
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gad1c1d6eeda7db1871cd1784732a5e0da"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gad1c1d6eeda7db1871cd1784732a5e0da" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const T(&amp;data)[N],
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gabef76e2272da473d88969a772b6543d6"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gabef76e2272da473d88969a772b6543d6" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">array&lt;T, N&gt;&amp; data,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga31f0b66f5f6a643b935db781f03d9b7c"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, size_t N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga31f0b66f5f6a643b935db781f03d9b7c" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">array&lt;const T, N&gt;&amp; data,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga7f5cf4f68b6d5812aba4b808f1cf6243"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga7f5cf4f68b6d5812aba4b808f1cf6243" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">vector&lt;T, Allocator&gt;&amp; data,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gabbe8ddd52bc0c681170b9f8806235bd4"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gabbe8ddd52bc0c681170b9f8806235bd4" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const vector&lt;T, Allocator&gt;&amp; data,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga7d611f93ef654e28f7619af62811c126"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class CharT, class Traits, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">mutable_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga7d611f93ef654e28f7619af62811c126" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">basic_string&lt;CharT, Traits, Allocator&gt;&amp; data,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gac77d6eb0aea0ad854b92cdd6e376531d"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class CharT, class Traits, class Allocator&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gac77d6eb0aea0ad854b92cdd6e376531d" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">const basic_string&lt;CharT, Traits, Allocator&gt;&amp; data,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga3b47e23f6bd3736df121fe650512bb4c"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class CharT, class Traits&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">const_buffer </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga3b47e23f6bd3736df121fe650512bb4c" class="m-doc-self">buffer</a>(</span><span class="m-doc-wrap">basic_string_view&lt;CharT, Traits&gt; data,
+              size_t n) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a></p>
+<p>depending on the undelying type, creates a <a href="group__buffer.html#ga94315e4ce78fbaf6fafb53eb9ba4d9aa" class="m-doc">ark::<wbr />mutable_buffer</a> or <a href="group__buffer.html#gadfe0a1fd39251d654b117699e0865c08" class="m-doc">ark::<wbr />const_buffer</a>, an additional size_t could also be served to limit the size of the buffer returned.</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.creation] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga5045f80493f3be0d4c653d8296a9f25e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const mutable_buffer* </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga5045f80493f3be0d4c653d8296a9f25e" class="m-doc-self">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator to the first buffer of ConstBufferSequence</p>
+<p>returns std::addressof(b) for buffers, and c.begin() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga00f7a394dab556cb337d52fa2ec1dbb5"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const const_buffer* </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga00f7a394dab556cb337d52fa2ec1dbb5" class="m-doc-self">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator to the first buffer of ConstBufferSequence</p>
+<p>returns std::addressof(b) for buffers, and c.begin() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga6f2afe9886a7dfc41debbc356c2ca267"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class C&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga6f2afe9886a7dfc41debbc356c2ca267" class="m-doc-self">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">C&amp; c) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator to the first buffer of ConstBufferSequence</p>
+<p>returns std::addressof(b) for buffers, and c.begin() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gac3c8d73e1485947b91ae79ead68b65e8"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class C&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gac3c8d73e1485947b91ae79ead68b65e8" class="m-doc-self">buffer_sequence_begin</a>(</span><span class="m-doc-wrap">const C&amp; c) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator to the first buffer of ConstBufferSequence</p>
+<p>returns std::addressof(b) for buffers, and c.begin() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gacc80e534f0c0b9603c453c606a9a5c04"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const mutable_buffer* </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gacc80e534f0c0b9603c453c606a9a5c04" class="m-doc-self">buffer_sequence_end</a>(</span><span class="m-doc-wrap">const mutable_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator past the last buffer of BufferSequence</p>
+<p>returns std::addressof(b)+1 for buffers, and c.end() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga1f9ca4e531da2b8ab5fdc3830f5b6ffc"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const const_buffer* </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga1f9ca4e531da2b8ab5fdc3830f5b6ffc" class="m-doc-self">buffer_sequence_end</a>(</span><span class="m-doc-wrap">const const_buffer&amp; b) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator past the last buffer of BufferSequence</p>
+<p>returns std::addressof(b)+1 for buffers, and c.end() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga0bb6641a27fa85d38e27454ca4f46225"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class C&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga0bb6641a27fa85d38e27454ca4f46225" class="m-doc-self">buffer_sequence_end</a>(</span><span class="m-doc-wrap">C&amp; c) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator past the last buffer of BufferSequence</p>
+<p>returns std::addressof(b)+1 for buffers, and c.end() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga4ee78735a3aec659c9e8b5a2f39fcf5c"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class C&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga4ee78735a3aec659c9e8b5a2f39fcf5c" class="m-doc-self">buffer_sequence_end</a>(</span><span class="m-doc-wrap">const C&amp; c) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns an iterator past the last buffer of BufferSequence</p>
+<p>returns std::addressof(b)+1 for buffers, and c.end() for iterables of buffers</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.seq.access] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="gad152f37385e4beb8f9faf9d941c108cf"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class ConstBufferSequence&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">size_t </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#gad152f37385e4beb8f9faf9d941c108cf" class="m-doc-self">buffer_size</a>(</span><span class="m-doc-wrap">const ConstBufferSequence&amp; buffers) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>returns the sum size of a ConstBufferSequence</p>
+<p>time complexity O(sizeof(buffers))</p><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.size] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga6bd4e7b8c1d8f03dadbef8e94763297e"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class MutableBufferSequence, class ConstBufferSequence&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">size_t </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ga6bd4e7b8c1d8f03dadbef8e94763297e" class="m-doc-self">buffer_copy</a>(</span><span class="m-doc-wrap">const MutableBufferSequence&amp; dest,
+              const ConstBufferSequence&amp; source,
+              size_t max_size)</span></span>
+            </h3>
+            <p>copy the underlying bytes from one buffer to another</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">dest</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>source</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>max_size&nbsp;<span class="m-label m-flat m-info">in</span></td>
+                  <td>the max bytes allowed to copy</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-success"><h4>Precondition</h4><p>no overlaps allowed between source and dest, otherwise the behavior is undefined</p></aside><aside class="m-note m-default"><h4>Remark</h4><p>[buffer.copy] as defined in N4771, see <a href="info_network.html" class="m-doc">the Networking TS</a></p></aside>
+          </div></section>
+        </section>
+        <section>
+          <h2>Variable documentation</h2>
+          <section class="m-doc-details" id="gab2bd8a530ae82113c32317531c0be54b"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              bool <a href="#gab2bd8a530ae82113c32317531c0be54b" class="m-doc-self">is_mutable_buffer_sequence_v</a> <span class="m-label m-primary">constexpr</span>
+            </h3>
+            <p>helper for is_mutable_buffer_sequence::value</p>
+<aside class="m-note m-default"><h4>See also</h4><p><a href="group__buffer.html#ga305554990904df4b949cb7a3e240d16c" class="m-doc">ark::<wbr />is_mutable_buffer_sequence</a></p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ga7c799cf70ab4163da3ba6ce39b145f86"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              bool <a href="#ga7c799cf70ab4163da3ba6ce39b145f86" class="m-doc-self">is_const_buffer_sequence_v</a> <span class="m-label m-primary">constexpr</span>
+            </h3>
+            <p>helper for is_const_buffer_sequence::value</p>
+<aside class="m-note m-default"><h4>See also</h4><p><a href="group__buffer.html#gac2c6478982dac5b9d3f21cae05265f1c" class="m-doc">ark::<wbr />is_const_buffer_sequence</a></p></aside>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script src="searchdata-v1.js" async="async"></script>
+</body>
+</html>
