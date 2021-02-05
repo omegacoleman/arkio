@@ -21,7 +21,7 @@ class seekable_fd : public with_async_context {
 private:
   struct base_type {
     int fd_;
-    clinux::off_t offset_;
+    clinux::off_t offset_{0};
 
     base_type(int fd_int) noexcept : fd_(fd_int) {}
 

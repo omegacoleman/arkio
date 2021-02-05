@@ -67,6 +67,7 @@ using std::forward;
 using std::is_const_v;
 using std::is_convertible_v;
 using std::is_pointer_v;
+using std::is_same_v;
 using std::is_standard_layout_v;
 using std::is_trivially_copyable_v;
 using std::is_void_v;

@@ -44,6 +44,7 @@ using ::inet_ntop;
 using ::inet_pton;
 using ::iovec;
 using ::listen;
+using ::loff_t;
 using ::lseek;
 using ::memfd_create;
 using ::mkostemp;
@@ -63,6 +64,8 @@ using ::sockaddr_in6;
 using ::sockaddr_storage;
 using ::socket;
 using ::socklen_t;
+using ::splice;
+using ::vmsplice;
 using ::write;
 using ::writev;
 

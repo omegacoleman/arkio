@@ -46,7 +46,7 @@ struct nonseekable_read_buffer_sequence_impl {
 
   static void run(op_t &op) noexcept {
     size_t to_transfer_max =
-        op.locals_->cond_(op.locals_->b_, op.locals_->done_sz_);
+        op.locals_->cond_(buffer_size(op.locals_->b_), op.locals_->done_sz_);
     if (!to_transfer_max)
       return op.complete(op.locals_->done_sz_);
     op.locals_->iov_.clear();
@@ -104,7 +104,7 @@ struct nonseekable_write_buffer_sequence_impl {
 
   static void run(op_t &op) noexcept {
     size_t to_transfer_max =
-        op.locals_->cond_(op.locals_->b_, op.locals_->done_sz_);
+        op.locals_->cond_(buffer_size(op.locals_->b_), op.locals_->done_sz_);
     if (!to_transfer_max)
       return op.complete(op.locals_->done_sz_);
     op.locals_->iov_.clear();

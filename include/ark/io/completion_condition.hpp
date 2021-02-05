@@ -11,9 +11,8 @@ namespace ark {
 /*! \cond HIDDEN_CLASSES */
 
 struct transfer_all_t {
-  template <class ConstBufferSequence>
-  size_t operator()(const ConstBufferSequence &b, size_t done) noexcept {
-    return (done < buffer_size(b)) ? numeric_limits<size_t>::max() : 0;
+  size_t operator()(size_t buffer_sz, size_t done) noexcept {
+    return (done < buffer_sz) ? (buffer_sz - done) : 0;
   }
 };
 
@@ -21,9 +20,8 @@ struct transfer_at_least_t {
   size_t n;
   transfer_at_least_t(size_t n) : n(n) {}
 
-  template <class ConstBufferSequence>
-  size_t operator()(const ConstBufferSequence &b, size_t done) noexcept {
-    return (done < min(n, buffer_size(b))) ? numeric_limits<size_t>::max() : 0;
+  size_t operator()(size_t buffer_sz, size_t done) noexcept {
+    return (done < min(n, buffer_sz)) ? (buffer_sz - done) : 0;
   }
 };
 
@@ -31,10 +29,8 @@ struct transfer_exactly_t {
   size_t n;
   transfer_exactly_t(size_t n) : n(n) {}
 
-  template <class ConstBufferSequence>
-  size_t operator()(const ConstBufferSequence &b, size_t done) noexcept {
-    size_t sz = buffer_size(b);
-    return (done < sz) ? (done - sz) : 0;
+  size_t operator()(size_t buffer_sz, size_t done) noexcept {
+    return (done < min(n, buffer_sz)) ? (min(n, buffer_sz) - done) : 0;
   }
 };
 

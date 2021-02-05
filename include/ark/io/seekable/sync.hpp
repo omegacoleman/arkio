@@ -27,7 +27,7 @@ inline result<size_t> read(seekable_fd &f, const MutableBufferSequence &b,
 
   size_t done_sz = 0;
 
-  while (size_t to_transfer_max = cond(b, done_sz)) {
+  while (size_t to_transfer_max = cond(buffer_size(b), done_sz)) {
     auto iov = to_iovecs(b, done_sz, to_transfer_max);
     ssize_t syscall_ret =
         clinux::preadv2(f.get(), iov.data(), iov.size(), f.offset(), 0);
@@ -66,7 +66,7 @@ inline result<size_t> write(seekable_fd &f, const ConstBufferSequence &b,
 
   size_t done_sz = 0;
 
-  while (size_t to_transfer_max = cond(b, done_sz)) {
+  while (size_t to_transfer_max = cond(buffer_size(b), done_sz)) {
     auto iov = to_iovecs(b, done_sz, to_transfer_max);
     ssize_t syscall_ret =
         clinux::pwritev2(f.get(), iov.data(), iov.size(), f.offset(), 0);

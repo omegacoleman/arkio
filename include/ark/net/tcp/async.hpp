@@ -47,17 +47,21 @@ struct accept_with_address_impl {
     acceptor &f_;
     address &endpoint_;
 
-    clinux::socklen_t addrlen_buf{sizeof(clinux::sockaddr)};
+    clinux::socklen_t addrlen_buf;
 
-    locals_t(acceptor &f, address &endpoint) : f_(f), endpoint_(endpoint) {}
+    locals_t(acceptor &f, address &endpoint) : f_(f), endpoint_(endpoint), addrlen_buf{endpoint_.sa_len()} {}
   };
   using ret_t = result<socket>;
   using op_t = async_op<accept_with_address_impl>;
 
   static void run(op_t &op) noexcept {
+    auto& ctx = op.ctx_;
+    auto fd = op.locals_->f_.get();
+    auto sa_ptr = op.locals_->endpoint_.sa_ptr();
+    auto addr_ptr = addressof(op.locals_->addrlen_buf);
     auto ret = async_syscall::accept(
-        op.ctx_, op.locals_->f_.get(), op.locals_->endpoint_.sa_ptr(),
-        addressof(op.locals_->addrlen_buf), 0,
+        ctx, fd, sa_ptr,
+        addr_ptr, 0,
         op.yield_syscall(accept_with_address_impl::finish));
     if (ret.has_error())
       return op.complete(ret.as_failure());

@@ -29,12 +29,16 @@ buffer_sequence_begin(const const_buffer &b) noexcept {
 }
 
 /*! \copydoc buffer_sequence_begin(const mutable_buffer &) */
-template <class C> auto buffer_sequence_begin(C &c) noexcept {
+template <class C, class T = enable_if_t<!(is_same_v<C, const_buffer> ||
+                                           is_same_v<C, mutable_buffer>)>>
+auto buffer_sequence_begin(C &c) noexcept {
   return c.begin();
 }
 
 /*! \copydoc buffer_sequence_begin(const mutable_buffer &) */
-template <class C> auto buffer_sequence_begin(const C &c) noexcept {
+template <class C, class T = enable_if_t<!(is_same_v<C, const_buffer> ||
+                                           is_same_v<C, mutable_buffer>)>>
+auto buffer_sequence_begin(const C &c) noexcept {
   return c.begin();
 }
 
@@ -56,10 +60,16 @@ inline const const_buffer *buffer_sequence_end(const const_buffer &b) noexcept {
 }
 
 /*! \copydoc buffer_sequence_end(const mutable_buffer &) */
-template <class C> auto buffer_sequence_end(C &c) noexcept { return c.end(); }
+template <class C, class T = enable_if_t<!(is_same_v<C, const_buffer> ||
+                                           is_same_v<C, mutable_buffer>)>>
+auto buffer_sequence_end(C &c) noexcept {
+  return c.end();
+}
 
 /*! \copydoc buffer_sequence_end(const mutable_buffer &) */
-template <class C> auto buffer_sequence_end(const C &c) noexcept {
+template <class C, class T = enable_if_t<!(is_same_v<C, const_buffer> ||
+                                           is_same_v<C, mutable_buffer>)>>
+auto buffer_sequence_end(const C &c) noexcept {
   return c.end();
 }
 
