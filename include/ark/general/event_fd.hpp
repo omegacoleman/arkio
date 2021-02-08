@@ -14,14 +14,14 @@ namespace ark {
 /*!
  * \brief wraps fildes created by eventfd(2) as an io object
  */
-class event_fd : public nonseekable_fd {
+class event_fd : public fd {
 protected:
   /*!
    * \brief constructs from int fildes
    *
    * \param[in] fd_int must be an fildes opened by eventfd(2)
    */
-  event_fd(int fd_int) : nonseekable_fd(fd_int) {}
+  event_fd(int fd_int) : fd(fd_int) {}
 
 private:
   static result<event_fd> __create(async_context *ctx, unsigned int count,

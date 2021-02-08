@@ -17,14 +17,14 @@ namespace tcp {
  * \brief special io object available to bond, listen, and accept \ref
  * ark::net::tcp::socket from
  */
-class acceptor : public nonseekable_fd {
+class acceptor : public fd {
 protected:
   /*!
    * \brief constructs from int fildes
    *
    * \param[in] fd_int must be an fildes opened by socket(2)
    */
-  acceptor(int fd_int) : nonseekable_fd(fd_int) {}
+  acceptor(int fd_int) : fd(fd_int) {}
 
 private:
   static result<acceptor> __create(async_context *ctx,

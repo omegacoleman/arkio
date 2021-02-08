@@ -28,14 +28,14 @@ inline socket wrap_accepted_socket(async_context *ctx, int fd) noexcept;
  * or if the socket is retrieved by accepting from an \ref
  * ::ark::net::tcp::acceptor
  */
-class socket : public nonseekable_fd {
+class socket : public fd {
 protected:
   /*!
    * \brief constructs from int fildes
    *
    * \param[in] fd_int must be an fildes opened by socket(2)
    */
-  socket(int fd_int) : nonseekable_fd(fd_int) {}
+  socket(int fd_int) : fd(fd_int) {}
 
 private:
   static result<socket> __create(async_context *ctx,

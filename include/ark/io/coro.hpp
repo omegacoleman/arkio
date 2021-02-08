@@ -5,6 +5,7 @@
 #include <ark/coroutine.hpp>
 #include <ark/io/async.hpp>
 #include <ark/io/completion_condition.hpp>
+#include <ark/io/concepts.hpp>
 
 namespace ark {
 
@@ -19,7 +20,9 @@ namespace coro {
 
 /*! \cond HIDDEN_CLASSES */
 
-template <class Fd, class MutableBufferSequence, class CompletionCondition>
+template <concepts::Fd Fd,
+          concepts::MutableBufferSequence MutableBufferSequence,
+          concepts::CompletionCondition CompletionCondition>
 struct read_awaitable : public awaitable_op<result<size_t>> {
   Fd &f_;
   const MutableBufferSequence &b_;
@@ -33,7 +36,8 @@ struct read_awaitable : public awaitable_op<result<size_t>> {
   }
 };
 
-template <class Fd, class ConstBufferSequence, class CompletionCondition>
+template <concepts::Fd Fd, concepts::ConstBufferSequence ConstBufferSequence,
+          concepts::CompletionCondition CompletionCondition>
 struct write_awaitable : public awaitable_op<result<size_t>> {
   Fd &f_;
   const ConstBufferSequence &b_;
@@ -55,22 +59,12 @@ struct write_awaitable : public awaitable_op<result<size_t>> {
  *
  * returns an Awaitable which yields an result<size_t> when co_awaited.
  */
-template <class Fd, class MutableBufferSequence, class CompletionCondition>
+template <concepts::Fd Fd,
+          concepts::MutableBufferSequence MutableBufferSequence,
+          concepts::CompletionCondition CompletionCondition>
 inline auto read(Fd &f, const MutableBufferSequence &b,
                  CompletionCondition cond) noexcept {
   return read_awaitable(f, b, cond);
-}
-
-/*!
- * \brief returns an Awaitable which write to fd from buffer until completion
- * condition is met.
- *
- * returns an Awaitable which yields an result<size_t> when co_awaited.
- */
-template <class Fd, class ConstBufferSequence, class CompletionCondition>
-inline auto write(Fd &f, const ConstBufferSequence &b,
-                  CompletionCondition cond) noexcept {
-  return write_awaitable(f, b, cond);
 }
 
 /*!
@@ -79,7 +73,8 @@ inline auto write(Fd &f, const ConstBufferSequence &b,
  *
  * same as read(f, b, transfer_all())
  */
-template <class Fd, class MutableBufferSequence>
+template <concepts::Fd Fd,
+          concepts::MutableBufferSequence MutableBufferSequence>
 inline auto read(Fd &f, const MutableBufferSequence &b) noexcept {
   return read_awaitable(f, b, transfer_all());
 }
@@ -88,9 +83,22 @@ inline auto read(Fd &f, const MutableBufferSequence &b) noexcept {
  * \brief returns an Awaitable which write to fd from buffer until completion
  * condition is met.
  *
+ * returns an Awaitable which yields an result<size_t> when co_awaited.
+ */
+template <concepts::Fd Fd, concepts::ConstBufferSequence ConstBufferSequence,
+          concepts::CompletionCondition CompletionCondition>
+inline auto write(Fd &f, const ConstBufferSequence &b,
+                  CompletionCondition cond) noexcept {
+  return write_awaitable(f, b, cond);
+}
+
+/*!
+ * \brief returns an Awaitable which write to fd from buffer until completion
+ * condition is met.
+ *
  * same as write(f, b, transfer_all())
  */
-template <class Fd, class ConstBufferSequence>
+template <concepts::Fd Fd, concepts::ConstBufferSequence ConstBufferSequence>
 inline auto write(Fd &f, const ConstBufferSequence &b) noexcept {
   return write_awaitable(f, b, transfer_all());
 }

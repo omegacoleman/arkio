@@ -4,8 +4,9 @@
 
 #include <ark/buffer.hpp>
 #include <ark/io/completion_condition.hpp>
+#include <ark/io/concepts.hpp>
+#include <ark/io/fd.hpp>
 #include <ark/io/iovecs.hpp>
-#include <ark/io/seekable/seekable_fd.hpp>
 
 namespace ark {
 
@@ -20,19 +21,19 @@ namespace sync {
  *
  * blocks until complete or error.
  */
-template <class Fd, class MutableBufferSequence, class CompletionCondition>
+template <concepts::Fd Fd,
+          concepts::MutableBufferSequence MutableBufferSequence,
+          concepts::CompletionCondition CompletionCondition>
 inline result<size_t> read(Fd &f, const MutableBufferSequence &b,
                            CompletionCondition cond) {
-  static_assert(is_mutable_buffer_sequence_v<MutableBufferSequence>);
-
   size_t done_sz = 0;
 
   while (size_t to_transfer_max = cond(buffer_size(b), done_sz)) {
     auto iov = to_iovecs(b, done_sz, to_transfer_max);
     ssize_t syscall_ret;
-    if constexpr (Fd::seekable) {
+    if constexpr (concepts::Seekable<Fd>) {
       syscall_ret =
-        clinux::preadv2(f.get(), iov.data(), iov.size(), f.offset(), 0);
+          clinux::preadv2(f.get(), iov.data(), iov.size(), f.offset(), 0);
     } else {
       syscall_ret = clinux::readv(f.get(), iov.data(), iov.size());
     }
@@ -41,7 +42,7 @@ inline result<size_t> read(Fd &f, const MutableBufferSequence &b,
     } else if (syscall_ret == 0) { // eof
       return done_sz;
     } else {
-      if constexpr (Fd::seekable) {
+      if constexpr (concepts::Seekable<Fd>) {
         f.feed(syscall_ret);
       }
       done_sz += syscall_ret;
@@ -56,7 +57,8 @@ inline result<size_t> read(Fd &f, const MutableBufferSequence &b,
  *
  * blocks until complete or error, same as read(f, b, transfer_all()).
  */
-template <class Fd, class MutableBufferSequence>
+template <concepts::Fd Fd,
+          concepts::MutableBufferSequence MutableBufferSequence>
 inline result<size_t> read(Fd &f, const MutableBufferSequence &b) {
   return read(f, b, transfer_all());
 }
@@ -66,26 +68,25 @@ inline result<size_t> read(Fd &f, const MutableBufferSequence &b) {
  *
  * blocks until complete or error.
  */
-template <class Fd, class ConstBufferSequence, class CompletionCondition>
+template <concepts::Fd Fd, concepts::ConstBufferSequence ConstBufferSequence,
+          concepts::CompletionCondition CompletionCondition>
 inline result<size_t> write(Fd &f, const ConstBufferSequence &b,
                             CompletionCondition cond) {
-  static_assert(is_const_buffer_sequence_v<ConstBufferSequence>);
-
   size_t done_sz = 0;
 
   while (size_t to_transfer_max = cond(buffer_size(b), done_sz)) {
     auto iov = to_iovecs(b, done_sz, to_transfer_max);
     ssize_t syscall_ret;
-    if constexpr (Fd::seekable) {
+    if constexpr (concepts::Seekable<Fd>) {
       syscall_ret =
-        clinux::pwritev2(f.get(), iov.data(), iov.size(), f.offset(), 0);
+          clinux::pwritev2(f.get(), iov.data(), iov.size(), f.offset(), 0);
     } else {
       syscall_ret = clinux::writev(f.get(), iov.data(), iov.size());
     }
     if (syscall_ret == -1) {
       return clinux::errno_ec();
     } else {
-      if constexpr (Fd::seekable) {
+      if constexpr (concepts::Seekable<Fd>) {
         f.feed(syscall_ret);
       }
       done_sz += syscall_ret;
@@ -100,7 +101,7 @@ inline result<size_t> write(Fd &f, const ConstBufferSequence &b,
  *
  * blocks until complete or error, same as write(f, b, transfer_all()).
  */
-template <class Fd, class ConstBufferSequence>
+template <concepts::Fd Fd, concepts::ConstBufferSequence ConstBufferSequence>
 inline result<size_t> write(Fd &f, const ConstBufferSequence &b) {
   return write(f, b, transfer_all());
 }

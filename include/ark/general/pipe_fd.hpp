@@ -14,14 +14,14 @@ namespace ark {
 /*!
  * \brief wraps fildes created by pipe2(2) as an io object
  */
-class pipe_fd : public nonseekable_fd {
+class pipe_fd : public fd {
 protected:
   /*!
    * \brief constructs from int fildes
    *
    * \param[in] fd_int must be an fildes opened by pipe2(2)
    */
-  pipe_fd(int fd_int) : nonseekable_fd(fd_int) {}
+  pipe_fd(int fd_int) : fd(fd_int) {}
 
 private:
   static result<pair<pipe_fd, pipe_fd>> __create(async_context *ctx) noexcept {

@@ -22,6 +22,7 @@
 
 #include <ark/io/async.hpp>
 #include <ark/io/completion_condition.hpp>
+#include <ark/io/concepts.hpp>
 #include <ark/io/fd.hpp>
 #include <ark/io/sync.hpp>
 
