@@ -69,10 +69,6 @@ using ::vmsplice;
 using ::write;
 using ::writev;
 
-inline error_code errno_ec() noexcept {
-  return error_code(errno, system_category());
-}
-
 using version_t = long;
 
 static const inline version_t version_code = LINUX_VERSION_CODE;
@@ -83,6 +79,13 @@ inline const constexpr version_t version(const int major, const int minor,
 }
 
 } // namespace clinux
+
+inline error_code as_ec(int errc_int) noexcept {
+  return make_error_code(static_cast<errc>(errc_int));
+}
+
+inline error_code errno_ec() noexcept { return as_ec(errno); }
+
 } // namespace ark
 
 /*! \endcond */

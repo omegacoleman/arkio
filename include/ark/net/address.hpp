@@ -120,7 +120,7 @@ public:
     const char *s = clinux::inet_ntop(AF_INET, &(base_type::sa_ptr()->sin_addr),
                                       buff, sizeof(buff));
     if (s == nullptr) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     return {s};
   }
@@ -136,7 +136,7 @@ public:
     int ret = clinux::inet_pton(address_family, host_s.c_str(),
                                 &(base_type::sa_ptr()->sin_addr));
     if (ret <= 0)
-      return error_code(EINVAL, system_category());
+      return as_ec(EINVAL);
     return success();
   }
 
@@ -175,7 +175,7 @@ public:
    */
   static result<inet_address> from_address(address addr) noexcept {
     if (addr.sa_ptr()->sa_family != address_family)
-      return error_code(EAFNOSUPPORT, system_category());
+      return as_ec(EAFNOSUPPORT);
     return inet_address{addr};
   }
 };
@@ -205,7 +205,7 @@ public:
     const char *s = clinux::inet_ntop(
         AF_INET6, &(base_type::sa_ptr()->sin6_addr), buff, sizeof(buff));
     if (s == nullptr) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     return {s};
   }
@@ -221,7 +221,7 @@ public:
     int ret = clinux::inet_pton(address_family, host_s.c_str(),
                                 &(base_type::sa_ptr()->sin6_addr));
     if (ret <= 0)
-      return error_code(EINVAL, system_category());
+      return as_ec(EINVAL);
     return success();
   }
 
@@ -260,7 +260,7 @@ public:
    */
   static result<inet6_address> from_address(address addr) noexcept {
     if (addr.sa_ptr()->sa_family != address_family)
-      return error_code(EAFNOSUPPORT, system_category());
+      return as_ec(EAFNOSUPPORT);
     return inet6_address{addr};
   }
 };
@@ -280,7 +280,7 @@ result<string> to_string(const address &addr) {
     OUTCOME_TRY(ret, inet6_address::from_address(addr));
     return ret.to_string();
   }
-  return error_code(EAFNOSUPPORT, system_category());
+  return as_ec(EAFNOSUPPORT);
 }
 
 /*! @} */

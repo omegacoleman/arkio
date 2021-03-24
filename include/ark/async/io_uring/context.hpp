@@ -61,7 +61,7 @@ private:
                   array<char, sizeof(uint64_t)> b;
                   auto read_ret = clinux::read(waker_evfd_, b.data(), b.size());
                   if (read_ret == -1) {
-                    this->exit(clinux::errno_ec());
+                    this->exit(errno_ec());
                     return;
                   }
                   auto next_ret = this->add_waker();
@@ -90,7 +90,7 @@ public:
 
     int waker_ret = clinux::eventfd(0, 0);
     if (waker_ret == -1)
-      return clinux::errno_ec();
+      return errno_ec();
     waker_evfd_ = waker_ret;
 
     auto ret = r_.queue_init(batch_size, 0);
@@ -122,7 +122,7 @@ public:
     static uint64_t d{1};
     auto write_ret = clinux::write(waker_evfd_, &d, sizeof(d));
     if (write_ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     return success();
   }

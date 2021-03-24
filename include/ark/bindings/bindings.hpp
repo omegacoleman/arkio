@@ -74,6 +74,7 @@ using std::is_void_v;
 using std::istringstream;
 using std::list;
 using std::lock_guard;
+using std::make_error_code;
 using std::make_pair;
 using std::make_unique;
 using std::map;

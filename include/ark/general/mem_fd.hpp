@@ -28,7 +28,7 @@ private:
                                  int flags) noexcept {
     int ret = clinux::memfd_create(name.c_str(), flags);
     if (ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     mem_fd f{ret};
     f.set_async_context(ctx);

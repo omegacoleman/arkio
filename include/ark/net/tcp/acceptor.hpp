@@ -31,7 +31,7 @@ private:
                                    bool use_ipv6 = false) noexcept {
     int ret = clinux::socket(use_ipv6 ? AF_INET6 : AF_INET, SOCK_STREAM, 0);
     if (ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     acceptor ret_fd(ret);
     ret_fd.set_async_context(ctx);

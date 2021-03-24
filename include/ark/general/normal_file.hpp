@@ -28,7 +28,7 @@ private:
                                     mode_t mode) noexcept {
     int ret = clinux::open(path.c_str(), flags, mode);
     if (ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     normal_file ret_fd(ret);
     ret_fd.set_async_context(ctx);
@@ -39,7 +39,7 @@ private:
                                         int flags) noexcept {
     int ret = clinux::mkostemp(const_cast<char *>(templ.c_str()), flags);
     if (ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     normal_file ret_fd(ret);
     ret_fd.set_async_context(ctx);

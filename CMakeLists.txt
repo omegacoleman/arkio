@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.1)
 project(arkio)
 
+set(CMAKE_CXX_STANDARD 20)
+
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti")
     if(${WITH_COROUTINES})
-        set(CMAKE_CXX_STANDARD 20)
         if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts -stdlib=libc++")
             set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")

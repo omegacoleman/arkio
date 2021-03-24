@@ -30,7 +30,7 @@ private:
 
     result<void> close() noexcept {
       if (clinux::close(fd_) != 0) {
-        return clinux::errno_ec();
+        return errno_ec();
       }
       return success();
     }
@@ -97,7 +97,7 @@ private:
 
     result<void> close() noexcept {
       if (clinux::close(fd_) != 0) {
-        return clinux::errno_ec();
+        return errno_ec();
       }
       return success();
     }

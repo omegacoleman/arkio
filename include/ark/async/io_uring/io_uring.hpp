@@ -196,7 +196,7 @@ public:
     Expects(!inited_);
     int ret = liburing::io_uring_queue_init(entries, &ring_, flags);
     if (ret < 0) {
-      return {ret, system_category()};
+      return as_ec(-ret);
     }
     inited_ = true;
     return success();
@@ -208,7 +208,7 @@ public:
     if (ret != nullptr) {
       return sqe_ref{ret};
     }
-    return error_code{ENOBUFS, system_category()};
+    return as_ec(ENOBUFS);
   }
 
   int submit() noexcept {
@@ -221,7 +221,7 @@ public:
     liburing::io_uring_cqe *p_discarded;
     int ret = liburing::io_uring_wait_cqe(&ring_, &p_discarded);
     if (ret < 0) {
-      return {-ret, system_category()};
+      return as_ec(-ret);
     }
     return success();
   }

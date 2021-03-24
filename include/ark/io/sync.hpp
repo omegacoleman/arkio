@@ -38,7 +38,7 @@ inline result<size_t> read(Fd &f, const MutableBufferSequence &b,
       syscall_ret = clinux::readv(f.get(), iov.data(), iov.size());
     }
     if (syscall_ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     } else if (syscall_ret == 0) { // eof
       return done_sz;
     } else {
@@ -84,7 +84,7 @@ inline result<size_t> write(Fd &f, const ConstBufferSequence &b,
       syscall_ret = clinux::writev(f.get(), iov.data(), iov.size());
     }
     if (syscall_ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     } else {
       if constexpr (concepts::Seekable<Fd>) {
         f.feed(syscall_ret);

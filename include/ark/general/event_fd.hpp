@@ -28,7 +28,7 @@ private:
                                    int flags) noexcept {
     int ret = clinux::eventfd(count, flags);
     if (ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     event_fd f{ret};
     f.set_async_context(ctx);

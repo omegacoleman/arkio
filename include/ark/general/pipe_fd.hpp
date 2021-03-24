@@ -28,7 +28,7 @@ private:
     int pipefd[2];
     int ret = clinux::pipe2(pipefd, 0);
     if (ret == -1) {
-      return clinux::errno_ec();
+      return errno_ec();
     }
     pipe_fd f_in{pipefd[0]};
     pipe_fd f_out{pipefd[1]};
