@@ -25,7 +25,7 @@ On linux, Coroutine TS support is only mature enough with clang++ and libcxx. If
 
 You will also need CMake > 3.1 and liburing.
 
-Coroutine TS related parts demands c++20 to compile, the others are written in c++17. This library was written in `-fno-rtti -fno-exceptions` dialect of c++. It does not require users to turn off that too, however. But it's strongly advised to do so, as it will lead to great performance boost and reduce size of generated binaries.
+This library was written in `-fno-rtti -fno-exceptions` dialect of c++20. It does not require users to turn off those too, however. But it's strongly advised to do so, as it will lead to great performance boost and reduce size of generated binaries.
 
 ## compiling tests and examples
 
